@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tangsel Sports Bot — Informasi Prasarana Olahraga</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Widget resmi RasaHQ (pengganti rasa-webchat yang lama) -->
+    <script
+      type="module"
+      src="https://unpkg.com/@rasahq/chat-widget-ui/dist/rasa-chatwidget/rasa-chatwidget.esm.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@rasahq/chat-widget-ui/dist/rasa-chatwidget/rasa-chatwidget.css"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.1/lib/index.css">
+</head>
+<body>
+
+    <div class="header-banner">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="image/1782666392920.png" alt="Logo Kota Tangerang Selatan" class="tangsel-logo">
+            </div>
+            <div class="text-container">
+                <p class="eyebrow">Pemerintah Kota Tangerang Selatan</p>
+                <h1>Chatbot Prasarana Olahraga Tangsel</h1>
+                <p class="subtitle">Layanan Chatbot Interaktif Dinas Pemuda dan Olahraga untuk Informasi Fasilitas GOR, Stadion, Kolam Renang, dan Lapangan Terbuka.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="scoreboard">
+        <div class="stat">
+            <span class="num">15</span>
+            <span class="label">Prasarana Terdata</span>
+        </div>
+        <div class="stat">
+            <span class="num">9</span>
+            <span class="label">Cabang Olahraga</span>
+        </div>
+        <div class="stat">
+            <span class="num">6</span>
+            <span class="label">Wilayah Kecamatan</span>
+        </div>
+    </div>
+
+    <div class="chat-container" id="chat-container"></div>
+
+    <div class="footer-section">
+        <p class="slogan-text">Cerdas • Modern • Religius</p>
+        <p class="footer-note">Basis data dikelola secara berkala oleh Dinas Pemuda dan Olahraga (DISPORA) Kota Tangerang Selatan.</p>
+    </div>
+
+    <script>
+        /* global window, document */
+        (function () {
+            var e = document.createElement("script");
+            var t = document.head || document.getElementsByTagName("head")[0];
+
+            e.src = "https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.1/lib/index.js";
+            e.async = true;
+
+            e.onload = function () {
+                if (window.WebChat && window.WebChat.default) {
+                    window.WebChat.default(
+                        {
+                            customData: { language: "id" },
+                            // GANTI dengan domain/IP VPS kamu setelah deploy
+                            socketUrl: "https://prasarana-tangsel.my.id",
+                            title: "Layanan Chat DISPORA",
+                            subtitle: "Informasi Prasarana Olahraga Tangsel",
+                            initPayload: "/greet",
+                            profileAvatar: "image/1782666392920.png",
+                            inputTextFieldHint: "Ketik pesan Anda di sini...",
+                            showMessageDate: true,
+                            embedded: true,
+                            showFullScreenButton: false
+                        },
+                        document.getElementById("chat-container")
+                    );
+                } else {
+                    console.error("Gagal memuat komponen utama Rasa WebChat.");
+                }
+            };
+
+            t.insertBefore(e, t.firstChild);
+        })();
+
+        localStorage.clear();
+        sessionStorage.clear();
+    </script>
+</body>
+</html>

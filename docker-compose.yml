@@ -1,0 +1,34 @@
+services:
+  rasa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rasa-server
+    restart: unless-stopped
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./models:/app/models
+    env_file:
+      - .env
+    depends_on:
+      - action-server
+    networks:
+      - rasa-net
+
+  action-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.actions
+    container_name: rasa-action-server
+    restart: unless-stopped
+    expose:
+      - "5055"
+    env_file:
+      - .env
+    networks:
+      - rasa-net
+
+networks:
+  rasa-net:
+    driver: bridge

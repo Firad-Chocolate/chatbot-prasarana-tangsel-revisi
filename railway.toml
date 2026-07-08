@@ -1,0 +1,9 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Menjalankan Action Server di background (port 5055) dan Rasa Core di foreground (port $PORT)
+startCommand = "python -m rasa_sdk --actions actions --port 5055 & rasa run --enable-api --cors \"*\" --credentials credentials.yml --endpoints endpoints.yml --port $PORT"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

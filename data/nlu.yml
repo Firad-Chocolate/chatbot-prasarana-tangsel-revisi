@@ -1,0 +1,249 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - halo
+    - hai
+    - hi
+    - hello
+    - selamat pagi
+    - selamat siang
+    - selamat sore
+    - selamat malam
+    - assalamualaikum
+    - permisi min
+    - halo kak
+    - p
+    - hai bot
+
+- intent: goodbye
+  examples: |
+    - bye
+    - selamat tinggal
+    - sampai jumpa
+    - terima kasih, segini saja
+    - oke terima kasih
+    - sudah cukup, terima kasih
+    - dadah
+    - oke sampai sini saja
+    - terima kasih banyak, sampai jumpa
+    - cukup sekian informasinya
+    - makasih ya
+
+- intent: affirm
+  examples: |
+    - ya
+    - iya
+    - benar
+    - betul
+    - tentu
+    - oke
+    - baik
+    - silakan
+    - lanjutkan saja
+    - boleh
+
+- intent: deny
+  examples: |
+    - tidak
+    - bukan
+    - nggak
+    - enggak
+    - tidak usah
+    - jangan
+    - tidak perlu
+
+- intent: bot_challenge
+  examples: |
+    - apakah kamu robot?
+    - kamu chatbot ya?
+    - apakah ini bot?
+    - saya bicara dengan manusia atau bot?
+    - kamu manusia atau AI?
+    - kamu siapa?
+    - kamu ini apa?
+    - ini layanan otomatis ya?
+
+- intent: list_jenis_olahraga
+  examples: |
+    - olahraga apa saja yang tersedia?
+    - jenis olahraga apa yang ada?
+    - ada cabang olahraga apa saja?
+    - sebutkan semua jenis olahraga
+    - daftar olahraga yang ada di tangsel apa saja
+    - cabang olahraga apa yang didata pemkot?
+    - apa saja jenis olahraga yang tercatat?
+    - list olahraga yang tersedia
+    - olahraga yang difasilitasi pemkot tangsel apa saja?
+
+- intent: list_kecamatan
+  examples: |
+    - kecamatan apa saja yang ada datanya?
+    - sebutkan kecamatan yang tercatat
+    - data ini mencakup kecamatan apa saja?
+    - wilayah mana saja yang ada prasarananya?
+    - daftar kecamatan yang tersedia
+    - kecamatan apa saja di data ini?
+    - mencakup kecamatan mana saja datanya?
+    - kecamatan mana saja yang punya fasilitas olahraga?
+
+- intent: list_semua_prasarana
+  examples: |
+    - sebutkan semua prasarana olahraga
+    - ada prasarana apa saja?
+    - tampilkan semua data prasarana
+    - daftar semua lapangan dan gor yang ada
+    - apa saja prasarana olahraga yang dimiliki pemkot tangsel?
+    - tolong list semua fasilitas olahraga
+    - semua prasarana olahraga apa saja yang tercatat?
+    - tunjukkan seluruh data prasarana olahraga
+    - mau lihat semua data prasarana
+
+- intent: cari_prasarana_olahraga
+  examples: |
+    - ada lapangan [futsal](olahraga) dimana?
+    - dimana saya bisa main [tenis](olahraga)?
+    - lapangan [tenis](olahraga)?
+    - cari tempat [renang](olahraga)
+    - kolam [renang](olahraga)
+    - ada [kolam renang](olahraga) dimana?
+    - saya cari lapangan [sepak bola](olahraga)
+    - lapangan bola [sepak bola](olahraga)
+    - dimana tempat main [basket](olahraga)?
+    - saya cari lapangan [basket](olahraga)
+    - ada GOR untuk [badminton](olahraga) tidak?
+    - lapangan [badminton](olahraga)
+    - lapangan [bola voli](olahraga) ada dimana?
+    - dimana lokasi [wall climbing](olahraga)?
+    - dimana tempat [wall climbing](olahraga)
+    - tempat [softball](olahraga) ada dimana?
+    - lapangan [softball](olahraga)
+    - saya mau main [futsal](olahraga), ada dimana?
+    - lapangan untuk [sepak bola](olahraga) apa saja?
+    - dimana saja lokasi [bulu tangkis](olahraga)?
+    - lapangan [bulu tangkis](olahraga)
+    - ada tempat untuk [panjat dinding](olahraga)?
+    - cari lokasi [voli](olahraga)
+    - dimana lapangan [bola](olahraga) terdekat?
+    - rekomendasi tempat [renang](olahraga)
+    - rekomendasi tempat berenang [renang](olahraga)
+    - mau cari tempat main [tenis](olahraga) dimana ya?
+    - lapangan [tenis](olahraga) dimana?
+    - ada fasilitas [basket](olahraga) tidak?
+    - lapangan [basket](olahraga)
+
+- intent: cari_prasarana_kecamatan
+  examples: |
+    - prasarana apa saja yang ada di [Pamulang](kecamatan)?
+    - ada lapangan apa di [Ciputat](kecamatan)?
+    - fasilitas olahraga di [Pondok Aren](kecamatan) apa saja?
+    - di kecamatan [Serpong](kecamatan) ada prasarana apa?
+    - sebutkan prasarana olahraga di [Setu](kecamatan)
+    - apa saja yang ada di [Serpong Utara](kecamatan)?
+    - lapangan olahraga di [Pamulang](kecamatan) dimana saja?
+    - GOR di [Ciputat](kecamatan) ada dimana?
+    - saya tinggal di [Pondok Aren](kecamatan), ada lapangan olahraga gak?
+    - prasarana olahraga di kecamatan [Pamulang](kecamatan) apa saja?
+    - kalau di [Serpong](kecamatan) ada fasilitas olahraga apa?
+    - fasilitas olahraga apa yang ada di [Setu](kecamatan)?
+
+- intent: cari_prasarana_olahraga_kecamatan
+  examples: |
+    - lapangan [sepak bola](olahraga) di [Pamulang](kecamatan)
+    - ada [futsal](olahraga) di [Ciputat](kecamatan)?
+    - cari lapangan [tenis](olahraga) di [Serpong](kecamatan)
+    - [basket](olahraga) di [Pondok Aren](kecamatan) ada gak?
+    - tempat [renang](olahraga) di [Serpong](kecamatan) dimana?
+    - lapangan [bola](olahraga) yang ada di [Pamulang](kecamatan)
+    - mau main [badminton](olahraga) di [Ciputat](kecamatan)
+    - ada [voli](olahraga) di [Setu](kecamatan)?
+    - fasilitas [futsal](olahraga) di kecamatan [Pamulang](kecamatan)
+    - saya cari [wall climbing](olahraga) di [Pamulang](kecamatan)
+    - dimana lapangan [softball](olahraga) di [Serpong Utara](kecamatan)?
+    - ada lapangan [bola voli](olahraga) di [Pondok Aren](kecamatan)?
+    - cari GOR [badminton](olahraga) di [Pamulang](kecamatan)
+    - [tenis](olahraga) di [Setu](kecamatan) ada dimana?
+    - lapangan [sepak bola](olahraga) di wilayah [Ciputat](kecamatan)
+    - ada kolam [renang](olahraga) di [Serpong](kecamatan)?
+    - mau cari tempat [basket](olahraga) di [Pamulang](kecamatan)
+    - lokasi lapangan [futsal](olahraga) di [Pondok Aren](kecamatan)
+
+- intent: detail_prasarana
+  examples: |
+    - dimana alamat [GOR Ciputat](nama_prasarana)?
+    - info tentang [Community Center Pamulang](nama_prasarana)
+    - link maps [Kolam Renang Panorama](nama_prasarana) apa?
+    - detail [Stadion Mini Ciputat](nama_prasarana)
+    - alamat lengkap [Lapangan Tenis Setu](nama_prasarana) dimana?
+    - status [Lapangan Bola Rempoa](nama_prasarana) aktif tidak?
+    - bagaimana cara ke [Lapangan Tenis Bintaro Jaya](nama_prasarana)?
+    - tolong info [Gedung Serba Guna Villa Mutiara](nama_prasarana)
+    - [GOR Ciputat](nama_prasarana) ada di kecamatan mana?
+    - dimana lokasi [Lapangan Softball Alamsutra](nama_prasarana)?
+    - alamat [Lapangan Bola Parigi](nama_prasarana) dimana?
+    - [Lapangan Tenis Villa Pamulang Mas](nama_prasarana) itu untuk olahraga apa?
+    - saya mau tahu detail [Lapangan Bola Villa 2000 Pamulang](nama_prasarana)
+
+- synonym: Sepak bola
+  examples: |
+    - sepak bola
+    - bola
+    - sepakbola
+
+- synonym: Bola Voli
+  examples: |
+    - bola voli
+    - voli
+
+- synonym: Renang
+  examples: |
+    - renang
+    - berenang
+    - kolam renang
+
+- synonym: Badminton
+  examples: |
+    - badminton
+    - bulu tangkis
+
+- synonym: Wall Climbing
+  examples: |
+    - wall climbing
+    - panjat dinding
+
+- lookup: kecamatan
+  examples: |
+    - Ciputat
+    - Pondok Aren
+    - Pamulang
+    - Serpong Utara
+    - Setu
+    - Serpong
+
+- lookup: olahraga
+  examples: |
+    - Sepak bola
+    - Tenis
+    - Futsal
+    - Basket
+    - Wall Climbing
+    - Badminton
+    - Bola Voli
+    - Softball
+    - Renang
+
+- lookup: nama_prasarana
+  examples: |
+    - Lapangan Bola Rempoa
+    - Lapangan Bola Parigi
+    - Lapangan Bola Villa 2000 Pamulang
+    - Community Center Pamulang
+    - Stadion Mini Ciputat
+    - Gedung Serba Guna Villa Mutiara
+    - GOR Ciputat
+    - Lapangan Softball Alamsutra
+    - Lapangan Tenis Bintaro Jaya
+    - Lapangan Tenis Villa Pamulang Mas
+    - Lapangan Tenis Setu
+    - Kolam Renang Panorama

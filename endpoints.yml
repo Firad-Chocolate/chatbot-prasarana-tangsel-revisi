@@ -1,0 +1,16 @@
+action_endpoint:
+  # ACTION_ENDPOINT_URL diset di .env, beda nilai tergantung platform deploy:
+  #   - VPS (docker-compose, 2 container terpisah): http://action-server:5055/webhook
+  #   - Railway (1 container, rasa + action server jalan bareng)  : http://127.0.0.1:5055/webhook
+  url: ${ACTION_ENDPOINT_URL}
+
+# Tracker store opsional ke PostgreSQL. Aktifkan hanya jika memang mau simpan
+# riwayat percakapan ke database (butuh DB_HOST, DB_USER, dst di .env).
+# tracker_store:
+#   type: SQL
+#   dialect: "postgresql"
+#   url: ${DB_HOST}
+#   port: ${DB_PORT}
+#   db: ${DB_NAME}
+#   username: ${DB_USER}
+#   password: ${DB_PASSWORD}

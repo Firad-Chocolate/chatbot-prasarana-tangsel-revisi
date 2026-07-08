@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rasa</title>
+</head>
+<body>
+    <h1>Rasa Ui</h1>
+    <script>!(function () {
+  let e = document.createElement("script"),
+    t = document.head || document.getElementsByTagName("head")[0];
+  (e.src =
+    "https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.js"),
+    // Replace 1.x.x with the version that you want
+    (e.async = !0),
+    (e.onload = () => {
+      window.WebChat.default(
+        {
+          customData: { language: "en" },
+          // GANTI dengan domain/IP VPS kamu setelah deploy, contoh:
+          // "https://chatbot.domainkamu.com" atau "http://IP_VPS_KAMU:5005"
+          socketUrl: "GANTI_DENGAN_URL_VPS_KAMU",
+          title:"Tangsel Bot",
+          initPayload: '/greet',
+          // add other props here
+        },
+        null
+      );
+    }),
+    t.insertBefore(e, t.firstChild);
+})();
+localStorage.clear();
+</script>
+</body>
+</html>

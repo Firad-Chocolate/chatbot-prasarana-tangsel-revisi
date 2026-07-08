@@ -1,0 +1,286 @@
+/* ==========================================================================
+   Tangsel Sports Bot — Identitas Visual Resmi Kota Tangerang Selatan
+   Konsep: Pelayanan Publik Digital Modern Menggunakan Rasa Webchat Tradisional
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@600;700&display=swap');
+
+:root {
+  --tangsel-blue-dark: #0f4c75;
+  --tangsel-blue: #1b4f72;
+  --tangsel-blue-light: #eff6ff;
+  --tangsel-gold: #f4b41a;
+  --tangsel-red: #e02424;
+  --tangsel-text-dark: #1e293b;
+  --tangsel-text-muted: #64748b;
+  --white: #ffffff;
+  --border-color: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--tangsel-text-dark);
+  background: linear-gradient(135deg, #f0f4f8 0%, #e6eff7 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 30%;
+  right: -5%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(27, 79, 114, 0.05) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   PERBAIKAN UTAMA: HEADER BANNER BACKGROUND WARNA KHAS TANGSEL
+   ========================================================================== */
+.header-banner {
+  background: linear-gradient(135deg, var(--tangsel-blue-dark) 0%, #0a334f 100%);
+  border-bottom: 5px solid var(--tangsel-gold); /* Aksen emas tipis di bawah banner */
+  padding: 35px 20px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 15px rgba(15, 76, 117, 0.15);
+}
+
+.header-content {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: left;
+}
+
+.logo-container {
+  flex-shrink: 0;
+}
+
+.tangsel-logo {
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  background-color: var(--white);
+  padding: 6px;
+  border-radius: 10px; /* Membuat logo perisai berdiri rapi di dalam kotak putih elegan */
+}
+
+.header-content .text-container {
+  flex: 1;
+}
+
+.header-content .eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tangsel-gold); /* Teks Pemerintah Kota diubah jadi emas agar kontras dengan background biru */
+  margin: 0 0 4px;
+}
+
+.header-content h1 {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: clamp(26px, 3.5vw, 36px);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--white); /* Teks judul putih terang */
+}
+
+.header-content .subtitle {
+  margin: 6px 0 0 0;
+  max-width: 650px;
+  color: #cbd5e1; /* Deskripsi teks abu-abu terang */
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   SCOREBOARD (PAPAN RINGKASAN DATA)
+   ========================================================================== */
+.scoreboard {
+  position: relative;
+  z-index: 1;
+  margin: 30px auto 0;
+  display: flex;
+  justify-content: center;
+  width: 90%;
+  max-width: 650px;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-bottom: 4px solid var(--tangsel-gold);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(27, 79, 114, 0.05);
+  overflow: hidden;
+}
+
+.scoreboard .stat {
+  flex: 1;
+  padding: 14px 10px;
+  text-align: center;
+  border-right: 1px solid var(--border-color);
+}
+
+.scoreboard .stat:last-child {
+  border-right: none;
+}
+
+.scoreboard .stat .num {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(24px, 4vw, 30px);
+  font-weight: 700;
+  color: var(--tangsel-blue);
+}
+
+.scoreboard .stat .label {
+  display: block;
+  margin-top: 2px;
+  font-size: clamp(10px, 1.5vw, 11px);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--tangsel-text-muted);
+}
+
+/* ==========================================================================
+   PERBAIKAN UTAMA: CHAT CONTAINER TINGGI TETAP (TIDAK DINAMIS / MELAR)
+   ========================================================================== */
+.chat-container {
+  position: relative;
+  z-index: 99;
+  flex: none; /* Mencegah flexbox meregangkan kontainer di luar batas */
+  width: 95%;
+  max-width: 750px;
+  margin: 30px auto;
+  padding: 0;
+
+  /* Kunci ukuran tinggi konstan absolut agar tidak melar mengikuti text chat */
+  height: 520px !important;
+}
+
+/* Memaksa kerangka Rasa Webchat patuh pada tinggi container di atas */
+.chat-container .rw-widget-container {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important; /* Memaksa scroll internal aktif saat chat memanjang */
+  min-height: 100% !important;
+  box-shadow: 0 15px 35px rgba(27, 79, 114, 0.12) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(27, 79, 114, 0.15) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Memastikan area pesan di dalam melakukan internal scrolling, bukan merusak layout luar */
+.chat-container .rw-messages-container {
+  flex: 1 !important;
+  height: calc(100% - 120px) !important; /* Menyisakan ruang untuk header dan input text */
+  overflow-y: auto !important;
+}
+
+/* Kustomisasi Warna Elemen Header Jendela Chatbot */
+.chat-container .rw-header {
+  background-color: var(--tangsel-blue-dark) !important;
+  padding: 15px !important;
+}
+
+/* Mengubah Gelembung Chat Pengirim (User) -> Biru Resmi Tangsel */
+.chat-container .rw-messages-container .rw-message .rw-client {
+  background-color: var(--tangsel-blue) !important;
+  color: var(--white) !important;
+}
+
+/* Mengubah Gelembung Chat Penerima (Bot) -> Abu-abu Bersih Premium */
+.chat-container .rw-messages-container .rw-message .rw-response {
+  background-color: #f1f5f9 !important;
+  color: var(--tangsel-text-dark) !important;
+}
+
+.rw-launcher {
+  display: none !important;
+}
+
+/* ==========================================================================
+   FOOTER SECTION
+   ========================================================================== */
+.footer-section {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 10px 10px 25px;
+  margin-top: auto;
+}
+
+.slogan-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--tangsel-red);
+  margin: 0 0 4px 0;
+}
+
+.footer-note {
+  font-size: 11px;
+  color: var(--tangsel-text-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVE ALL DEVICES (KOMPUTER, LAPTOP, TABLET, SMARTPHONE)
+   ========================================================================== */
+@media (max-width: 650px) {
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .tangsel-logo {
+    height: 75px;
+  }
+
+  .scoreboard {
+    width: calc(100% - 32px);
+    margin-top: 20px;
+    border-radius: 8px;
+    flex-direction: column;
+  }
+
+  .scoreboard .stat {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px;
+  }
+
+  .scoreboard .stat:last-child {
+    border-bottom: none;
+  }
+
+  .chat-container {
+    width: calc(100% - 24px);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 460px !important; /* Tetap mengunci tinggi statis di layar HP */
+  }
+}

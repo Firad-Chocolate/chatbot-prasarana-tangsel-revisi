@@ -1,0 +1,6 @@
+.env
+models/
+*.zip
+__pycache__/
+*.pyc
+.idea/

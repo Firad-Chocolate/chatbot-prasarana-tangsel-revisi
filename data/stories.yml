@@ -1,0 +1,54 @@
+version: "3.1"
+
+stories:
+
+- story: Sapa lalu cari prasarana berdasarkan olahraga
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: cari_prasarana_olahraga
+      entities:
+        - olahraga: "futsal"
+    - action: action_cari_prasarana_olahraga
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: Cari berdasarkan kecamatan lalu minta detail salah satu prasarana
+  steps:
+    - intent: cari_prasarana_kecamatan
+      entities:
+        - kecamatan: "Pamulang"
+    - action: action_cari_prasarana_kecamatan
+    - intent: detail_prasarana
+      entities:
+        - nama_prasarana: "Community Center Pamulang"
+    - action: action_detail_prasarana
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: Pengguna ingin tahu daftar olahraga dan kecamatan yang tersedia
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: list_jenis_olahraga
+    - action: action_list_jenis_olahraga
+    - intent: list_kecamatan
+    - action: action_list_kecamatan
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: Pengguna menanyakan identitas bot lalu minta semua data prasarana
+  steps:
+    - intent: bot_challenge
+    - action: utter_iamabot
+    - intent: list_semua_prasarana
+    - action: action_list_semua_prasarana
+
+- story: Cari detail prasarana langsung tanpa basa-basi
+  steps:
+    - intent: detail_prasarana
+      entities:
+        - nama_prasarana: "GOR Ciputat"
+    - action: action_detail_prasarana
+    - intent: goodbye
+    - action: utter_goodbye

@@ -1,0 +1,58 @@
+version: "3.1"
+
+rules:
+
+- rule: Menyapa pengguna
+  steps:
+    - intent: greet
+    - action: utter_greet
+
+- rule: Mengucapkan salam perpisahan
+  steps:
+    - intent: goodbye
+    - action: utter_goodbye
+
+- rule: Menjawab apakah ini bot
+  steps:
+    - intent: bot_challenge
+    - action: utter_iamabot
+
+- rule: Mencari prasarana berdasarkan jenis olahraga
+  steps:
+    - intent: cari_prasarana_olahraga
+    - action: action_cari_prasarana_olahraga
+
+- rule: Mencari prasarana berdasarkan kecamatan
+  steps:
+    - intent: cari_prasarana_kecamatan
+    - action: action_cari_prasarana_kecamatan
+
+- rule: Mencari prasarana berdasarkan olahraga dan kecamatan sekaligus
+  steps:
+    - intent: cari_prasarana_olahraga_kecamatan
+    - action: action_cari_prasarana_olahraga_kecamatan
+
+- rule: Menampilkan detail satu prasarana
+  steps:
+    - intent: detail_prasarana
+    - action: action_detail_prasarana
+
+- rule: Menampilkan seluruh daftar prasarana
+  steps:
+    - intent: list_semua_prasarana
+    - action: action_list_semua_prasarana
+
+- rule: Menampilkan seluruh jenis olahraga yang tersedia
+  steps:
+    - intent: list_jenis_olahraga
+    - action: action_list_jenis_olahraga
+
+- rule: Menampilkan seluruh kecamatan yang tercatat
+  steps:
+    - intent: list_kecamatan
+    - action: action_list_kecamatan
+
+- rule: Fallback ketika bot tidak memahami maksud pengguna
+  steps:
+    - intent: nlu_fallback
+    - action: utter_default

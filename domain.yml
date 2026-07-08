@@ -1,0 +1,77 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - bot_challenge
+  - list_jenis_olahraga
+  - list_kecamatan
+  - list_semua_prasarana
+  - cari_prasarana_olahraga
+  - cari_prasarana_kecamatan
+  - cari_prasarana_olahraga_kecamatan
+  - detail_prasarana
+
+entities:
+  - olahraga
+  - kecamatan
+  - nama_prasarana
+
+slots:
+  olahraga:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: olahraga
+
+  kecamatan:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: kecamatan
+
+  nama_prasarana:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: nama_prasarana
+
+responses:
+  utter_greet:
+    - text: "Halo! 👋 Selamat datang di layanan informasi *Prasarana Olahraga Kota Tangerang Selatan*.\n\nSaya siap membantu Anda menemukan lapangan, GOR, kolam renang, dan fasilitas olahraga lain milik Pemkot Tangsel. 🏟️\n\nCoba tanyakan:\n• 'Lapangan futsal di Pamulang'\n• 'Fasilitas olahraga di Ciputat'\n• 'Info GOR Ciputat'"
+
+  utter_goodbye:
+    - text: "Terima kasih telah menggunakan layanan informasi Prasarana Olahraga Tangerang Selatan! 🙏\nSampai jumpa dan selamat berolahraga! 💪"
+
+  utter_iamabot:
+    - text: "Saya adalah chatbot resmi informasi *Prasarana Olahraga Pemerintah Kota Tangerang Selatan* 🤖\n\nDikembangkan menggunakan Rasa Open Source untuk membantu warga Tangsel menemukan fasilitas olahraga terdekat."
+
+  utter_default:
+    - text: "Maaf, saya kurang memahami pertanyaan Anda. 🙏\n\nCoba tanyakan seperti ini:\n• *'Lapangan futsal di Pamulang?'*\n• *'Prasarana olahraga di Ciputat?'*\n• *'Info GOR Ciputat'*\n• *'Olahraga apa saja yang tersedia?'*"
+
+  utter_ask_olahraga:
+    - text: "Olahraga apa yang sedang Anda cari? ⚽🎾🏊\nContoh: futsal, tenis, renang, basket, badminton"
+
+  utter_ask_kecamatan:
+    - text: "Di kecamatan mana Anda ingin mencari prasarana? 📍\nContoh: Pamulang, Ciputat, Serpong, Pondok Aren"
+
+  utter_ask_nama_prasarana:
+    - text: "Nama prasarana mana yang ingin Anda ketahui detailnya? 🏟️\nContoh: GOR Ciputat, Kolam Renang Panorama"
+
+actions:
+  - action_cari_prasarana_olahraga
+  - action_cari_prasarana_kecamatan
+  - action_cari_prasarana_olahraga_kecamatan
+  - action_detail_prasarana
+  - action_list_semua_prasarana
+  - action_list_jenis_olahraga
+  - action_list_kecamatan
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
