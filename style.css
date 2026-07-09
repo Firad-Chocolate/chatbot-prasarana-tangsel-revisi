@@ -59,6 +59,58 @@ body::before {
    PERBAIKAN UTAMA: HEADER BANNER BACKGROUND WARNA KHAS TANGSEL
    ========================================================================== */
 /* ==========================================================================
+   TOP NAVBAR (logo kiri, tombol chatbot kanan, garis emas di bawah)
+   ========================================================================== */
+.top-navbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: var(--dark-bg-card-header);
+  border-bottom: 3px solid var(--tangsel-gold);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-logo {
+  height: 34px;
+  width: 34px;
+  object-fit: contain;
+  background: var(--white);
+  border-radius: 50%;
+  padding: 3px;
+}
+
+.navbar-title {
+  color: var(--white);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+
+.navbar-btn {
+  background: var(--tangsel-gold);
+  color: var(--tangsel-blue-dark);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.navbar-btn:hover {
+  background: #e0a000;
+}
+
+/* ==========================================================================
    HERO NAVY (logo tengah, statistik, tagline - background navy penuh)
    ========================================================================== */
 .hero-navy {
@@ -404,6 +456,19 @@ body::before {
    RESPONSIVE ALL DEVICES (KOMPUTER, LAPTOP, TABLET, SMARTPHONE)
    ========================================================================== */
 @media (max-width: 650px) {
+  .top-navbar {
+    padding: 10px 14px;
+  }
+
+  .navbar-title {
+    font-size: 13px;
+  }
+
+  .navbar-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
   .hero-logo-badge {
     width: 76px;
     height: 76px;
