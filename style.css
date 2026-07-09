@@ -48,94 +48,98 @@ body::before {
 /* ==========================================================================
    PERBAIKAN UTAMA: HEADER BANNER BACKGROUND WARNA KHAS TANGSEL
    ========================================================================== */
-.header-banner {
+/* ==========================================================================
+   HERO NAVY (logo tengah, statistik, tagline - background navy penuh)
+   ========================================================================== */
+.hero-navy {
   background: linear-gradient(135deg, var(--tangsel-blue-dark) 0%, #0a334f 100%);
-  border-bottom: 5px solid var(--tangsel-gold); /* Aksen emas tipis di bawah banner */
-  padding: 35px 20px;
+  border-bottom: 5px solid var(--tangsel-gold);
+  padding: 40px 20px 30px;
   position: relative;
   z-index: 1;
   box-shadow: 0 4px 15px rgba(15, 76, 117, 0.15);
+  text-align: center;
 }
 
-.header-content {
-  max-width: 900px;
-  margin: 0 auto;
-  display: flex;
+.hero-logo-badge {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  text-align: left;
-}
-
-.logo-container {
-  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  margin: 0 auto 16px;
+  padding: 6px;
 }
 
 .tangsel-logo {
-  height: 90px;
-  width: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  background-color: var(--white);
-  padding: 6px;
-  border-radius: 10px; /* Membuat logo perisai berdiri rapi di dalam kotak putih elegan */
 }
 
-.header-content .text-container {
-  flex: 1;
-}
-
-.header-content .eyebrow {
+.hero-navy .eyebrow {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--tangsel-gold); /* Teks Pemerintah Kota diubah jadi emas agar kontras dengan background biru */
-  margin: 0 0 4px;
+  color: var(--tangsel-gold);
+  margin: 0 0 8px;
 }
 
-.header-content h1 {
+.hero-navy h1 {
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  font-size: clamp(26px, 3.5vw, 36px);
+  font-size: clamp(26px, 4vw, 38px);
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  margin: 0;
-  color: var(--white); /* Teks judul putih terang */
+  margin: 0 0 12px;
+  color: var(--white);
 }
 
-.header-content .subtitle {
-  margin: 6px 0 0 0;
+.hero-navy .subtitle {
+  margin: 0 auto 28px;
   max-width: 650px;
-  color: #cbd5e1; /* Deskripsi teks abu-abu terang */
+  color: #cbd5e1;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+.hero-tagline {
+  margin: 20px 0 0;
+  font-family: 'Oswald', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--tangsel-gold);
 }
 
 /* ==========================================================================
-   SCOREBOARD (PAPAN RINGKASAN DATA)
+   SCOREBOARD (kartu putih statistik, di dalam hero navy)
    ========================================================================== */
 .scoreboard {
   position: relative;
   z-index: 1;
-  margin: 30px auto 0;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
-  width: 90%;
+  width: 100%;
   max-width: 650px;
   background: var(--white);
-  border: 1px solid var(--border-color);
-  border-bottom: 4px solid var(--tangsel-gold);
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(27, 79, 114, 0.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
 .scoreboard .stat {
   flex: 1;
-  padding: 14px 10px;
+  padding: 16px 10px;
   text-align: center;
   border-right: 1px solid var(--border-color);
+  border-bottom: 4px solid var(--tangsel-gold);
 }
 
 .scoreboard .stat:last-child {
@@ -370,18 +374,13 @@ body::before {
    RESPONSIVE ALL DEVICES (KOMPUTER, LAPTOP, TABLET, SMARTPHONE)
    ========================================================================== */
 @media (max-width: 650px) {
-  .header-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 14px;
-  }
-
-  .tangsel-logo {
-    height: 75px;
+  .hero-logo-badge {
+    width: 76px;
+    height: 76px;
   }
 
   .scoreboard {
-    width: calc(100% - 32px);
+    width: 100%;
     margin-top: 20px;
     border-radius: 8px;
     flex-direction: column;
