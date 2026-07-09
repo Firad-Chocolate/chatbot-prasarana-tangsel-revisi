@@ -421,3 +421,87 @@ class ActionListKecamatan(Action):
             )
         )
         return []
+
+class ActionTarifPrasarana(Action):
+    """Menampilkan tarif retribusi sebuah prasarana (khusus fasilitas yang punya data tarif, contoh: kolam renang)."""
+
+    def name(self) -> Text:
+        return "action_tarif_prasarana"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+        nama_prasarana: Optional[str] = tracker.get_slot("nama_prasarana")
+
+        if not nama_prasarana:
+            dispatcher.utter_message(response="utter_ask_nama_prasarana")
+            return []
+
+        prasarana_rows = query_db(
+            """
+            SELECT id, nama_prasarana
+            FROM prasarana_olahraga
+            WHERE nama_prasarana ILIKE %s
+            LIMIT 1;
+            """,
+            (f"%{nama_prasarana}%",),
+        )
+
+        if prasarana_rows is None:
+            dispatcher.utter_message(text=ERROR_DB)
+            return []
+
+        if not prasarana_rows:
+            dispatcher.utter_message(
+                text=f"😔 Maaf, tidak ditemukan prasarana dengan nama *{nama_prasarana}*."
+            )
+            return []
+
+        prasarana = prasarana_rows[0]
+
+        tarif_rows = query_db(
+            """
+            SELECT jenis_pengunjung, kategori, tipe_hari, keterangan_tambahan, tarif, satuan
+            FROM tarif_retribusi
+            WHERE prasarana_id = %s
+            ORDER BY jenis_pengunjung, id;
+            """,
+            (prasarana["id"],),
+        )
+
+        if tarif_rows is None:
+            dispatcher.utter_message(text=ERROR_DB)
+            return []
+
+        if not tarif_rows:
+            dispatcher.utter_message(
+                text=(
+                    f"ℹ️ Untuk saat ini belum ada data tarif retribusi yang tercatat "
+                    f"untuk *{prasarana['nama_prasarana']}*. Silakan hubungi pengelola "
+                    f"langsung untuk info tarif terbaru."
+                )
+            )
+            return []
+
+        baris_pengunjung = []
+        baris_rombongan = []
+        for r in tarif_rows:
+            harga = f"Rp{r['tarif']:,}".replace(",", ".")
+            if r["jenis_pengunjung"] == "Pengunjung":
+                hari = f" ({r['tipe_hari']})" if r["tipe_hari"] else ""
+                baris_pengunjung.append(f"  • {r['kategori']}{hari}: {harga} / {r['satuan']}")
+            else:
+                ket = f" ({r['keterangan_tambahan']})" if r["keterangan_tambahan"] else ""
+                baris_rombongan.append(f"  • {r['kategori']}{ket}: {harga} / {r['satuan']}")
+
+        pesan = f"💰 *Tarif Retribusi {prasarana['nama_prasarana']}*\n{SEPARATOR}\n"
+        if baris_pengunjung:
+            pesan += "👤 Pengunjung:\n" + "\n".join(baris_pengunjung) + "\n"
+        if baris_rombongan:
+            pesan += "\n👥 Rombongan:\n" + "\n".join(baris_rombongan)
+
+        dispatcher.utter_message(text=pesan.strip())
+        return []

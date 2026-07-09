@@ -37,6 +37,11 @@ rules:
     - intent: detail_prasarana
     - action: action_detail_prasarana
 
+- rule: Menampilkan tarif retribusi prasarana
+  steps:
+    - intent: tanya_tarif
+    - action: action_tarif_prasarana
+
 - rule: Menampilkan seluruh daftar prasarana
   steps:
     - intent: list_semua_prasarana

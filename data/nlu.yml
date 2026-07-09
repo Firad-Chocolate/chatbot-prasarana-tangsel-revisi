@@ -247,3 +247,17 @@ nlu:
     - Lapangan Tenis Villa Pamulang Mas
     - Lapangan Tenis Setu
     - Kolam Renang Panorama
+
+- intent: tanya_tarif
+  examples: |
+    - berapa tarif [Kolam Renang Panorama](nama_prasarana)?
+    - harga masuk [Kolam Renang Bintaro Regency](nama_prasarana) berapa?
+    - biaya retribusi [Kolam Renang Panorama](nama_prasarana)
+    - tarif weekend [Kolam Renang Bintaro Regency](nama_prasarana) berapa?
+    - berapa harga tiket masuk [Kolam Renang Panorama](nama_prasarana)?
+    - harga rombongan sekolah di [Kolam Renang Bintaro Regency](nama_prasarana)
+    - info tarif [Kolam Renang Panorama](nama_prasarana)
+    - berapa bayar untuk masuk [Kolam Renang Bintaro Regency](nama_prasarana)?
+    - harga anak-anak di [Kolam Renang Panorama](nama_prasarana) berapa?
+    - biaya masuk kolam renang
+    - berapa tarifnya

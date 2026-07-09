@@ -13,6 +13,7 @@ intents:
   - cari_prasarana_kecamatan
   - cari_prasarana_olahraga_kecamatan
   - detail_prasarana
+  - tanya_tarif
 
 entities:
   - olahraga
@@ -71,6 +72,7 @@ actions:
   - action_list_semua_prasarana
   - action_list_jenis_olahraga
   - action_list_kecamatan
+  - action_tarif_prasarana
 
 session_config:
   session_expiration_time: 60
