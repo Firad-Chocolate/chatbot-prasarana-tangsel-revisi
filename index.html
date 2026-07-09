@@ -5,17 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tangsel Sports Bot — Informasi Prasarana Olahraga</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- Widget resmi RasaHQ (pengganti rasa-webchat yang lama) -->
-    <script
-      type="module"
-      src="https://unpkg.com/@rasahq/chat-widget-ui/dist/rasa-chatwidget/rasa-chatwidget.esm.js"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@rasahq/chat-widget-ui/dist/rasa-chatwidget/rasa-chatwidget.css"
-    />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.1/lib/index.css">
 </head>
 <body>
 
@@ -47,7 +36,25 @@
         </div>
     </div>
 
-    <div class="chat-container" id="chat-container"></div>
+    <!-- Chat widget custom (menggantikan rasa-webchat CDN lama) -->
+    <div class="chat-container" id="chat-container">
+        <div class="chat-header">
+            <div class="chat-header-avatar">
+                <img src="image/1782666392920.png" alt="Bot">
+            </div>
+            <div class="chat-header-text">
+                <span class="chat-title">Chatbot Prasarana Olahraga Tangsel</span>
+                <span class="chat-status"><span class="dot"></span>Online</span>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages"></div>
+
+        <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Ketik pesan Anda di sini..." autocomplete="off">
+            <button id="chat-send" type="button" aria-label="Kirim">Kirim</button>
+        </div>
+    </div>
 
     <div class="footer-section">
         <p class="slogan-text">Cerdas • Modern • Religius</p>
@@ -55,42 +62,119 @@
     </div>
 
     <script>
-        /* global window, document */
-        (function () {
-            var e = document.createElement("script");
-            var t = document.head || document.getElementsByTagName("head")[0];
+    (function () {
+        var RASA_ENDPOINT = "/webhooks/rest/webhook";
+        var messagesEl = document.getElementById("chat-messages");
+        var inputEl = document.getElementById("chat-input");
+        var sendBtn = document.getElementById("chat-send");
 
-            e.src = "https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.1/lib/index.js";
-            e.async = true;
+        var WELCOME_TEXT = "Halo! \uD83D\uDC4B Selamat datang di layanan informasi Prasarana Olahraga Kota Tangerang Selatan. Ada yang bisa saya bantu?";
+        var DISCLAIMER_TEXT = "\u2139\uFE0F Chatbot ini hanya diperuntukkan untuk mencari informasi seputar Prasarana Olahraga milik Pemerintah Kota Tangerang Selatan, bukan tempat untuk membooking/menyewa prasarana secara online.";
 
-            e.onload = function () {
-                if (window.WebChat && window.WebChat.default) {
-                    window.WebChat.default(
-                        {
-                            customData: { language: "id" },
-                            // GANTI dengan domain/IP VPS kamu setelah deploy
-                            socketUrl: "https://prasarana-tangsel.my.id",
-                            title: "Layanan Chat DISPORA",
-                            subtitle: "Informasi Prasarana Olahraga Tangsel",
-                            initPayload: "/greet",
-                            profileAvatar: "image/1782666392920.png",
-                            inputTextFieldHint: "Ketik pesan Anda di sini...",
-                            showMessageDate: true,
-                            embedded: true,
-                            showFullScreenButton: false
-                        },
-                        document.getElementById("chat-container")
-                    );
-                } else {
-                    console.error("Gagal memuat komponen utama Rasa WebChat.");
-                }
-            };
+        var QUICK_REPLIES = [
+            { icon: "\uD83C\uDFDF\uFE0F", label: "Lokasi GOR", message: "Di mana saja lokasi GOR yang tersedia?" },
+            { icon: "\uD83C\uDFCA", label: "Kolam Renang", message: "Info kolam renang yang tersedia" },
+            { icon: "\uD83D\uDCCB", label: "Jadwal & Fasilitas", message: "Apa saja jenis olahraga yang tersedia?" }
+        ];
 
-            t.insertBefore(e, t.firstChild);
-        })();
+        function scrollToBottom() {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function addBubble(text, from) {
+            var wrap = document.createElement("div");
+            wrap.className = "msg-row " + (from === "bot" ? "msg-row-bot" : "msg-row-user");
+
+            var bubble = document.createElement("div");
+            bubble.className = "msg-bubble " + (from === "bot" ? "msg-bubble-bot" : "msg-bubble-user");
+            bubble.textContent = text;
+
+            wrap.appendChild(bubble);
+            messagesEl.appendChild(wrap);
+            scrollToBottom();
+        }
+
+        function addTyping() {
+            var wrap = document.createElement("div");
+            wrap.className = "msg-row msg-row-bot";
+            wrap.id = "typing-indicator";
+            var bubble = document.createElement("div");
+            bubble.className = "msg-bubble msg-bubble-bot msg-bubble-typing";
+            bubble.textContent = "mengetik...";
+            wrap.appendChild(bubble);
+            messagesEl.appendChild(wrap);
+            scrollToBottom();
+        }
+
+        function removeTyping() {
+            var t = document.getElementById("typing-indicator");
+            if (t) t.remove();
+        }
+
+        function addQuickReplies() {
+            var wrap = document.createElement("div");
+            wrap.className = "quick-replies";
+            QUICK_REPLIES.forEach(function (qr) {
+                var btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "quick-reply-btn";
+                btn.innerHTML = "<span>" + qr.icon + "</span> " + qr.label;
+                btn.addEventListener("click", function () {
+                    wrap.remove();
+                    sendMessage(qr.message);
+                });
+                wrap.appendChild(btn);
+            });
+            messagesEl.appendChild(wrap);
+            scrollToBottom();
+        }
+
+        function sendMessage(text) {
+            if (!text) return;
+            addBubble(text, "user");
+            inputEl.value = "";
+            addTyping();
+
+            fetch(RASA_ENDPOINT, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sender: "web-user", message: text })
+            })
+                .then(function (res) {
+                    if (!res.ok) throw new Error("Request gagal");
+                    return res.json();
+                })
+                .then(function (data) {
+                    removeTyping();
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(function (m) {
+                            if (m.text) addBubble(m.text, "bot");
+                        });
+                    } else {
+                        addBubble("Maaf, saya tidak menemukan jawaban untuk itu.", "bot");
+                    }
+                })
+                .catch(function () {
+                    removeTyping();
+                    addBubble("\u26A0\uFE0F Gagal terhubung ke server chatbot. Silakan coba lagi.", "bot");
+                });
+        }
+
+        sendBtn.addEventListener("click", function () {
+            sendMessage(inputEl.value.trim());
+        });
+        inputEl.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") sendMessage(inputEl.value.trim());
+        });
+
+        // Pesan pembuka + disclaimer + tombol pertanyaan cepat
+        addBubble(WELCOME_TEXT, "bot");
+        addBubble(DISCLAIMER_TEXT, "bot");
+        addQuickReplies();
 
         localStorage.clear();
         sessionStorage.clear();
+    })();
     </script>
 </body>
 </html>
