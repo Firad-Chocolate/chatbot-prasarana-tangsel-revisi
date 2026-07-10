@@ -1,6 +1,9 @@
 .env
 models/
+*.tar.gz
 *.zip
 __pycache__/
 *.pyc
+.rasa/
 .idea/
+credentials.yml
