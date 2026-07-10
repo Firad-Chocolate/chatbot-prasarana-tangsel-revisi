@@ -60,3 +60,23 @@ def query_db(sql: str, params: Optional[Tuple] = None) -> Optional[List[Dict[str
     finally:
         if conn is not None:
             conn.close()
+
+
+def execute_db(sql: str, params: Optional[Tuple] = None) -> bool:
+    """
+    Menjalankan query INSERT/UPDATE/DELETE (tidak ada hasil yang di-fetch).
+    Mengembalikan True jika berhasil, False jika terjadi error.
+    """
+    conn = None
+    try:
+        conn = get_connection()
+        with conn.cursor() as cur:
+            cur.execute(sql, params)
+        conn.commit()
+        return True
+    except Exception as e:
+        logger.error(f"Database error saat menjalankan execute: {e}")
+        return False
+    finally:
+        if conn is not None:
+            conn.close()

@@ -13,7 +13,7 @@ from typing import Any, Text, Dict, List, Optional
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 
-from .db import query_db
+from .db import query_db, execute_db
 
 ERROR_DB = (
     "⚠️ Maaf, saat ini saya tidak bisa mengakses data prasarana karena ada "
@@ -32,6 +32,27 @@ def kirim_foto(dispatcher: CollectingDispatcher, row: Dict[str, Any]) -> None:
         url = row.get(kolom)
         if url:
             dispatcher.utter_message(image=url)
+
+
+def log_chat(tracker: Tracker, jawaban_bot: str) -> None:
+    """
+    Mencatat setiap percakapan (pesan user + jawaban bot) ke tabel
+    history_chat_chatbot di Supabase. Semua percakapan digabung dalam satu
+    tabel (tidak dipisah per user), sesuai permintaan.
+    Kegagalan logging tidak boleh mengganggu jalannya chatbot, jadi error
+    apa pun di sini hanya dicatat ke log server, tidak ditampilkan ke user.
+    """
+    try:
+        session_id = tracker.sender_id or "unknown"
+        pesan_user = tracker.latest_message.get("text") or ""
+        gabungan = f"User: {pesan_user}\nBot: {jawaban_bot}"
+        execute_db(
+            "INSERT INTO history_chat_chatbot (session_id, respon_chatbot, tanggal_chat) "
+            "VALUES (%s, %s, NOW());",
+            (session_id, gabungan),
+        )
+    except Exception:
+        pass
 
 
 class ActionCariPrasaranaOlahraga(Action):
@@ -57,10 +78,10 @@ class ActionCariPrasaranaOlahraga(Action):
             SELECT nama_prasarana, alamat, kecamatan, google_maps_link,
                    link_gambar_1, link_gambar_2, link_gambar_3
             FROM prasarana_olahraga
-            WHERE olahraga ILIKE %s AND status ILIKE 'aktif'
+            WHERE (olahraga ILIKE %s OR nama_prasarana ILIKE %s) AND status ILIKE 'aktif'
             ORDER BY kecamatan, nama_prasarana;
             """,
-            (f"%{olahraga}%",),
+            (f"%{olahraga}%", f"%{olahraga}%"),
         )
 
         if rows is None:
@@ -91,6 +112,7 @@ class ActionCariPrasaranaOlahraga(Action):
             )
             kirim_foto(dispatcher, r)
 
+        log_chat(tracker, f"[{len(rows)} prasarana olahraga '{olahraga}' ditampilkan]")
         return []
 
 
@@ -151,6 +173,7 @@ class ActionCariPrasaranaKecamatan(Action):
             )
             kirim_foto(dispatcher, r)
 
+        log_chat(tracker, f"[{len(rows)} prasarana di kecamatan '{kecamatan}' ditampilkan]")
         return []
 
 
@@ -224,6 +247,7 @@ class ActionCariPrasaranaOlahragaKecamatan(Action):
             )
             kirim_foto(dispatcher, r)
 
+        log_chat(tracker, f"[{len(rows)} prasarana '{olahraga}' di '{kecamatan}' ditampilkan]")
         return []
 
 
@@ -288,6 +312,7 @@ class ActionDetailPrasarana(Action):
             )
         )
         kirim_foto(dispatcher, r)
+        log_chat(tracker, f"[Detail prasarana '{r['nama_prasarana']}' ditampilkan]")
         return []
 
 
@@ -336,6 +361,7 @@ class ActionListSemuaPrasarana(Action):
             lines.append(f"  • {r['nama_prasarana']} — {r['daftar_olahraga']}")
 
         dispatcher.utter_message(text="\n".join(lines))
+        log_chat(tracker, f"[Daftar {len(rows)} prasarana ditampilkan]")
         return []
 
 
@@ -378,6 +404,7 @@ class ActionListJenisOlahraga(Action):
                 f"*'Lapangan futsal di mana?'*"
             )
         )
+        log_chat(tracker, f"[Daftar {len(rows)} jenis olahraga ditampilkan]")
         return []
 
 
@@ -420,6 +447,7 @@ class ActionListKecamatan(Action):
                 f"*'Prasarana olahraga di Pamulang?'*"
             )
         )
+        log_chat(tracker, f"[Daftar {len(rows)} kecamatan ditampilkan]")
         return []
 
 class ActionTarifPrasarana(Action):
@@ -504,4 +532,61 @@ class ActionTarifPrasarana(Action):
             pesan += "\n👥 Rombongan:\n" + "\n".join(baris_rombongan)
 
         dispatcher.utter_message(text=pesan.strip())
+        log_chat(tracker, pesan.strip())
+        return []
+
+
+class ActionTarifSemuaKolam(Action):
+    """Menampilkan tarif retribusi seluruh kolam renang sekaligus (dipicu tombol 'Daftar Tarif')."""
+
+    def name(self) -> Text:
+        return "action_tarif_semua_kolam"
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+        rows = query_db(
+            """
+            SELECT p.nama_prasarana, t.jenis_pengunjung, t.kategori, t.tipe_hari,
+                   t.keterangan_tambahan, t.tarif, t.satuan
+            FROM tarif_retribusi t
+            JOIN prasarana_olahraga p ON p.id = t.prasarana_id
+            WHERE p.olahraga = 'Renang'
+            ORDER BY p.nama_prasarana, t.jenis_pengunjung, t.id;
+            """
+        )
+
+        if rows is None:
+            dispatcher.utter_message(text=ERROR_DB)
+            return []
+
+        if not rows:
+            dispatcher.utter_message(text="Belum ada data tarif kolam renang yang tercatat.")
+            return []
+
+        by_kolam: Dict[str, Dict[str, list]] = {}
+        for r in rows:
+            kolam = r["nama_prasarana"]
+            by_kolam.setdefault(kolam, {"Pengunjung": [], "Rombongan": []})
+            harga = f"Rp{r['tarif']:,}".replace(",", ".")
+            if r["jenis_pengunjung"] == "Pengunjung":
+                hari = f" ({r['tipe_hari']})" if r["tipe_hari"] else ""
+                by_kolam[kolam]["Pengunjung"].append(f"  • {r['kategori']}{hari}: {harga} / {r['satuan']}")
+            else:
+                ket = f" ({r['keterangan_tambahan']})" if r["keterangan_tambahan"] else ""
+                by_kolam[kolam]["Rombongan"].append(f"  • {r['kategori']}{ket}: {harga} / {r['satuan']}")
+
+        pesan = f"💰 *Daftar Tarif Retribusi Kolam Renang*\n{SEPARATOR}\n"
+        for kolam, kelompok in by_kolam.items():
+            pesan += f"\n🏊 *{kolam}*\n"
+            if kelompok["Pengunjung"]:
+                pesan += "👤 Pengunjung:\n" + "\n".join(kelompok["Pengunjung"]) + "\n"
+            if kelompok["Rombongan"]:
+                pesan += "👥 Rombongan:\n" + "\n".join(kelompok["Rombongan"]) + "\n"
+
+        dispatcher.utter_message(text=pesan.strip())
+        log_chat(tracker, pesan.strip())
         return []

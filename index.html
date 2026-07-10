@@ -79,7 +79,8 @@
         var QUICK_REPLIES = [
             { icon: "\uD83C\uDFDF\uFE0F", label: "Lokasi GOR", message: "Di mana saja lokasi GOR yang tersedia?" },
             { icon: "\uD83C\uDFCA", label: "Kolam Renang", message: "Info kolam renang yang tersedia" },
-            { icon: "\uD83D\uDCCB", label: "Jadwal & Fasilitas", message: "Apa saja jenis olahraga yang tersedia?" }
+            { icon: "\uD83D\uDCCB", label: "Jenis Olahraga", message: "Apa saja jenis olahraga yang tersedia?" },
+            { icon: "\uD83D\uDCB0", label: "Daftar Tarif", message: "Daftar tarif kolam renang" }
         ];
 
         function scrollToBottom() {
@@ -93,6 +94,24 @@
             var bubble = document.createElement("div");
             bubble.className = "msg-bubble " + (from === "bot" ? "msg-bubble-bot" : "msg-bubble-user");
             bubble.textContent = text;
+
+            wrap.appendChild(bubble);
+            messagesEl.appendChild(wrap);
+            scrollToBottom();
+        }
+
+        function addImageBubble(url) {
+            var wrap = document.createElement("div");
+            wrap.className = "msg-row msg-row-bot";
+
+            var bubble = document.createElement("div");
+            bubble.className = "msg-bubble msg-bubble-bot msg-bubble-image";
+
+            var img = document.createElement("img");
+            img.src = url;
+            img.alt = "Foto prasarana";
+            img.loading = "lazy";
+            bubble.appendChild(img);
 
             wrap.appendChild(bubble);
             messagesEl.appendChild(wrap);
@@ -154,6 +173,7 @@
                     if (Array.isArray(data) && data.length > 0) {
                         data.forEach(function (m) {
                             if (m.text) addBubble(m.text, "bot");
+                            if (m.image) addImageBubble(m.image);
                         });
                     } else {
                         addBubble("Maaf, saya tidak menemukan jawaban untuk itu.", "bot");

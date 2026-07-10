@@ -42,6 +42,16 @@ rules:
     - intent: tanya_tarif
     - action: action_tarif_prasarana
 
+- rule: Menampilkan daftar tarif semua kolam renang
+  steps:
+    - intent: daftar_tarif_kolam
+    - action: action_tarif_semua_kolam
+
+- rule: Menampilkan daftar tarif semua kolam renang
+  steps:
+    - intent: daftar_tarif_kolam
+    - action: action_tarif_semua_kolam
+
 - rule: Menampilkan seluruh daftar prasarana
   steps:
     - intent: list_semua_prasarana

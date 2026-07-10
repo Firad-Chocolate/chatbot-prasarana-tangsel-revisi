@@ -116,6 +116,11 @@ nlu:
     - lapangan [badminton](olahraga)
     - lapangan [bola voli](olahraga) ada dimana?
     - dimana lokasi [wall climbing](olahraga)?
+    - di mana saja lokasi [GOR](olahraga) yang tersedia?
+    - dimana lokasi [GOR](olahraga)?
+    - ada [GOR](olahraga) dimana saja?
+    - cari [GOR](olahraga)
+    - saya mau lihat lokasi [GOR](olahraga)
     - dimana tempat [wall climbing](olahraga)
     - tempat [softball](olahraga) ada dimana?
     - lapangan [softball](olahraga)
@@ -261,3 +266,14 @@ nlu:
     - harga anak-anak di [Kolam Renang Panorama](nama_prasarana) berapa?
     - biaya masuk kolam renang
     - berapa tarifnya
+
+- intent: daftar_tarif_kolam
+  examples: |
+    - daftar tarif kolam renang
+    - lihat semua tarif kolam renang
+    - berapa tarif semua kolam renang
+    - tarif kolam renang apa saja
+    - tampilkan daftar tarif
+    - list harga kolam renang
+    - saya mau lihat daftar harga kolam renang
+    - info tarif semua kolam

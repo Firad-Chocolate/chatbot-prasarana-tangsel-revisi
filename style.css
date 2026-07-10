@@ -351,6 +351,19 @@ body::before {
   color: var(--dark-text-muted);
 }
 
+.msg-bubble-image {
+  padding: 4px;
+  background: transparent;
+}
+
+.msg-bubble-image img {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 10px;
+  display: block;
+  object-fit: cover;
+}
+
 .quick-replies {
   display: flex;
   flex-wrap: wrap;
