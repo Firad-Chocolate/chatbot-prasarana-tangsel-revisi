@@ -55,6 +55,70 @@ def log_chat(tracker: Tracker, jawaban_bot: str) -> None:
         pass
 
 
+def format_harga_block(r: Dict[str, Any]) -> str:
+    """
+    Menyusun teks blok harga + nomor telepon pengelola dari satu baris data
+    prasarana. Ada 2 kemungkinan sumber data harga:
+    1. Kolom harga_member_sesi_1/2, harga_non_member_sesi_1/2 di tabel
+       prasarana_olahraga (dipakai kebanyakan cabang olahraga).
+    2. Tabel tarif_retribusi terpisah, dikelompokkan Pengunjung/Rombongan
+       dengan tipe hari weekday/weekend (khusus dipakai kolam renang).
+    Mengembalikan string kosong kalau kedua sumber sama sekali tidak ada data
+    (supaya action tidak menampilkan blok kosong).
+    """
+    harga_items = []
+    if r.get("harga_member_sesi_1"):
+        harga_items.append(f"  • Member Sesi 1    : Rp{r['harga_member_sesi_1']:,}".replace(",", "."))
+    if r.get("harga_member_sesi_2"):
+        harga_items.append(f"  • Member Sesi 2    : Rp{r['harga_member_sesi_2']:,}".replace(",", "."))
+    if r.get("harga_non_member_sesi_1"):
+        harga_items.append(f"  • Non-Member Sesi 1: Rp{r['harga_non_member_sesi_1']:,}".replace(",", "."))
+    if r.get("harga_non_member_sesi_2"):
+        harga_items.append(f"  • Non-Member Sesi 2: Rp{r['harga_non_member_sesi_2']:,}".replace(",", "."))
+
+    blok = ""
+
+    if harga_items:
+        blok = f"💰 *Daftar Harga:*\n🏷️ {r.get('olahraga', '')}:\n" + "\n".join(harga_items)
+    elif r.get("id"):
+        # Kolom sederhana kosong -> coba cek tabel tarif_retribusi (khusus kolam renang)
+        tarif_rows = query_db(
+            """
+            SELECT jenis_pengunjung, kategori, tipe_hari, keterangan_tambahan, tarif, satuan
+            FROM tarif_retribusi
+            WHERE prasarana_id = %s
+            ORDER BY jenis_pengunjung, id;
+            """,
+            (r["id"],),
+        )
+        if tarif_rows:
+            baris_pengunjung = []
+            baris_rombongan = []
+            for t in tarif_rows:
+                harga = f"Rp{t['tarif']:,}".replace(",", ".")
+                if t["jenis_pengunjung"] == "Pengunjung":
+                    hari = f" ({t['tipe_hari']})" if t["tipe_hari"] else ""
+                    baris_pengunjung.append(f"  • {t['kategori']}{hari}: {harga} / {t['satuan']}")
+                else:
+                    ket = f" ({t['keterangan_tambahan']})" if t["keterangan_tambahan"] else ""
+                    baris_rombongan.append(f"  • {t['kategori']}{ket}: {harga} / {t['satuan']}")
+
+            blok = "💰 *Daftar Harga:*\n"
+            if baris_pengunjung:
+                blok += "👤 Pengunjung:\n" + "\n".join(baris_pengunjung) + "\n"
+            if baris_rombongan:
+                blok += "👥 Rombongan:\n" + "\n".join(baris_rombongan)
+            blok = blok.strip()
+
+    if not blok:
+        return ""
+
+    if r.get("nomor_pengelola"):
+        blok += f"\n📞 Nomor Telepon Pengelola: {r['nomor_pengelola']}"
+
+    return blok
+
+
 class ActionCariPrasaranaOlahraga(Action):
     """Mencari prasarana berdasarkan jenis olahraga saja."""
 
@@ -75,7 +139,9 @@ class ActionCariPrasaranaOlahraga(Action):
 
         rows = query_db(
             """
-            SELECT nama_prasarana, alamat, kecamatan, google_maps_link,
+            SELECT id, nama_prasarana, olahraga, alamat, kecamatan, google_maps_link,
+                   nomor_pengelola, harga_member_sesi_1, harga_member_sesi_2,
+                   harga_non_member_sesi_1, harga_non_member_sesi_2,
                    link_gambar_1, link_gambar_2, link_gambar_3
             FROM prasarana_olahraga
             WHERE (olahraga ILIKE %s OR nama_prasarana ILIKE %s) AND status ILIKE 'aktif'
@@ -90,7 +156,7 @@ class ActionCariPrasaranaOlahraga(Action):
 
         if not rows:
             dispatcher.utter_message(
-                text=f"😔 Maaf, belum ada prasarana untuk olahraga *{olahraga}* yang tercatat."
+                text=f"😔 Maaf, untuk saat ini prasarana *{olahraga}* belum tersedia."
             )
             return []
 
@@ -102,14 +168,16 @@ class ActionCariPrasaranaOlahraga(Action):
         )
 
         for i, r in enumerate(rows, 1):
-            dispatcher.utter_message(
-                text=(
-                    f"*{i}. {r['nama_prasarana']}*\n"
-                    f"📍 {r['alamat']}\n"
-                    f"🏘️ Kec. {r['kecamatan']}\n"
-                    f"🗺️ {r['google_maps_link']}"
-                )
+            pesan = (
+                f"*{i}. {r['nama_prasarana']}*\n"
+                f"📍 {r['alamat']}\n"
+                f"🏘️ Kec. {r['kecamatan']}\n"
+                f"🗺️ {r['google_maps_link']}"
             )
+            blok_harga = format_harga_block(r)
+            if blok_harga:
+                pesan += f"\n{SEPARATOR}\n{blok_harga}"
+            dispatcher.utter_message(text=pesan)
             kirim_foto(dispatcher, r)
 
         log_chat(tracker, f"[{len(rows)} prasarana olahraga '{olahraga}' ditampilkan]")
@@ -136,7 +204,9 @@ class ActionCariPrasaranaKecamatan(Action):
 
         rows = query_db(
             """
-            SELECT nama_prasarana, olahraga, alamat, google_maps_link,
+            SELECT id, nama_prasarana, olahraga, alamat, google_maps_link,
+                   nomor_pengelola, harga_member_sesi_1, harga_member_sesi_2,
+                   harga_non_member_sesi_1, harga_non_member_sesi_2,
                    link_gambar_1, link_gambar_2, link_gambar_3
             FROM prasarana_olahraga
             WHERE kecamatan ILIKE %s AND status ILIKE 'aktif'
@@ -163,14 +233,16 @@ class ActionCariPrasaranaKecamatan(Action):
         )
 
         for i, r in enumerate(rows, 1):
-            dispatcher.utter_message(
-                text=(
-                    f"*{i}. {r['nama_prasarana']}*\n"
-                    f"⚽ {r['olahraga']}\n"
-                    f"📍 {r['alamat']}\n"
-                    f"🗺️ {r['google_maps_link']}"
-                )
+            pesan = (
+                f"*{i}. {r['nama_prasarana']}*\n"
+                f"⚽ {r['olahraga']}\n"
+                f"📍 {r['alamat']}\n"
+                f"🗺️ {r['google_maps_link']}"
             )
+            blok_harga = format_harga_block(r)
+            if blok_harga:
+                pesan += f"\n{SEPARATOR}\n{blok_harga}"
+            dispatcher.utter_message(text=pesan)
             kirim_foto(dispatcher, r)
 
         log_chat(tracker, f"[{len(rows)} prasarana di kecamatan '{kecamatan}' ditampilkan]")
@@ -203,7 +275,9 @@ class ActionCariPrasaranaOlahragaKecamatan(Action):
 
         rows = query_db(
             """
-            SELECT nama_prasarana, alamat, kecamatan, google_maps_link,
+            SELECT id, nama_prasarana, olahraga, alamat, kecamatan, google_maps_link,
+                   nomor_pengelola, harga_member_sesi_1, harga_member_sesi_2,
+                   harga_non_member_sesi_1, harga_non_member_sesi_2,
                    link_gambar_1, link_gambar_2, link_gambar_3
             FROM prasarana_olahraga
             WHERE olahraga ILIKE %s
@@ -237,14 +311,16 @@ class ActionCariPrasaranaOlahragaKecamatan(Action):
         )
 
         for i, r in enumerate(rows, 1):
-            dispatcher.utter_message(
-                text=(
-                    f"*{i}. {r['nama_prasarana']}*\n"
-                    f"📍 {r['alamat']}\n"
-                    f"🏘️ Kec. {r['kecamatan']}\n"
-                    f"🗺️ {r['google_maps_link']}"
-                )
+            pesan = (
+                f"*{i}. {r['nama_prasarana']}*\n"
+                f"📍 {r['alamat']}\n"
+                f"🏘️ Kec. {r['kecamatan']}\n"
+                f"🗺️ {r['google_maps_link']}"
             )
+            blok_harga = format_harga_block(r)
+            if blok_harga:
+                pesan += f"\n{SEPARATOR}\n{blok_harga}"
+            dispatcher.utter_message(text=pesan)
             kirim_foto(dispatcher, r)
 
         log_chat(tracker, f"[{len(rows)} prasarana '{olahraga}' di '{kecamatan}' ditampilkan]")
@@ -252,7 +328,7 @@ class ActionCariPrasaranaOlahragaKecamatan(Action):
 
 
 class ActionDetailPrasarana(Action):
-    """Menampilkan detail lengkap satu prasarana beserta semua fotonya."""
+    """Menampilkan detail lengkap satu prasarana: alamat, harga tiap cabang, nomor pengelola, dan foto."""
 
     def name(self) -> Text:
         return "action_detail_prasarana"
@@ -272,19 +348,13 @@ class ActionDetailPrasarana(Action):
         rows = query_db(
             """
             SELECT
-                nama_prasarana,
-                alamat,
-                kecamatan,
-                google_maps_link,
-                status,
-                STRING_AGG(DISTINCT olahraga, ', ') AS daftar_olahraga,
-                MAX(link_gambar_1) AS link_gambar_1,
-                MAX(link_gambar_2) AS link_gambar_2,
-                MAX(link_gambar_3) AS link_gambar_3
+                id, nama_prasarana, olahraga, alamat, kecamatan, google_maps_link, status,
+                nomor_pengelola, harga_member_sesi_1, harga_member_sesi_2,
+                harga_non_member_sesi_1, harga_non_member_sesi_2,
+                link_gambar_1, link_gambar_2, link_gambar_3
             FROM prasarana_olahraga
             WHERE nama_prasarana ILIKE %s
-            GROUP BY nama_prasarana, alamat, kecamatan, google_maps_link, status
-            LIMIT 1;
+            ORDER BY olahraga;
             """,
             (f"%{nama_prasarana}%",),
         )
@@ -299,20 +369,29 @@ class ActionDetailPrasarana(Action):
             )
             return []
 
-        r = rows[0]
-        dispatcher.utter_message(
-            text=(
-                f"🏟️ *{r['nama_prasarana']}*\n"
-                f"{SEPARATOR}\n"
-                f"⚽ Cabang Olahraga : {r['daftar_olahraga']}\n"
-                f"📍 Alamat          : {r['alamat']}\n"
-                f"🏘️ Kecamatan       : {r['kecamatan']}\n"
-                f"📌 Status          : {r['status']}\n"
-                f"🗺️ Google Maps     : {r['google_maps_link']}"
-            )
+        r0 = rows[0]
+        daftar_olahraga = ", ".join(dict.fromkeys(r["olahraga"] for r in rows if r["olahraga"]))
+
+        pesan = (
+            f"🏟️ *{r0['nama_prasarana']}*\n"
+            f"{SEPARATOR}\n"
+            f"⚽ Cabang Olahraga : {daftar_olahraga}\n"
+            f"📍 Alamat          : {r0['alamat']}\n"
+            f"🏘️ Kecamatan       : {r0['kecamatan']}\n"
+            f"📌 Status          : {r0['status']}\n"
+            f"🗺️ Google Maps     : {r0['google_maps_link']}"
         )
-        kirim_foto(dispatcher, r)
-        log_chat(tracker, f"[Detail prasarana '{r['nama_prasarana']}' ditampilkan]")
+
+        # Susun blok harga per cabang olahraga (kalau ada datanya)
+        blok_harga_list = [format_harga_block(r) for r in rows]
+        blok_harga_list = [b for b in blok_harga_list if b]
+
+        if blok_harga_list:
+            pesan += f"\n{SEPARATOR}\n" + f"\n{SEPARATOR}\n".join(blok_harga_list)
+
+        dispatcher.utter_message(text=pesan)
+        kirim_foto(dispatcher, r0)
+        log_chat(tracker, f"[Detail prasarana '{r0['nama_prasarana']}' ditampilkan]")
         return []
 
 
