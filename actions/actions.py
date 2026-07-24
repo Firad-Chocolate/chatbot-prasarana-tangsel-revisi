@@ -23,6 +23,28 @@ ERROR_DB = (
 SEPARATOR = "─────────────────────"
 
 
+def get_entity_fresh(tracker: Tracker, entity_name: str) -> Optional[str]:
+    """
+    Mengambil nilai entity langsung dari pesan TERAKHIR yang dikirim user
+    (tracker.latest_message), BUKAN dari slot.
+
+    Ini sengaja dipakai menggantikan tracker.get_slot() karena slot dengan
+    mapping 'from_entity' di Rasa TIDAK otomatis kosong kalau entity tidak
+    terdeteksi di pesan terbaru — nilainya tetap nyangkut dari pesan
+    sebelumnya. Akibatnya kalau user salah ketik ('voly' alih-alih 'voli')
+    sehingga entity gagal ter-deteksi, bot malah menjawab pakai topik
+    pertanyaan SEBELUMNYA (misal kolam renang) alih-alih bilang tidak paham.
+
+    Dengan membaca langsung dari tracker.latest_message, setiap pesan baru
+    selalu dievaluasi bersih tanpa terpengaruh riwayat percakapan.
+    """
+    entities = tracker.latest_message.get("entities", []) if tracker.latest_message else []
+    for e in entities:
+        if e.get("entity") == entity_name:
+            return e.get("value")
+    return None
+
+
 def kirim_foto(dispatcher: CollectingDispatcher, row: Dict[str, Any]) -> None:
     """
     Mengirim foto 1, 2, dan 3 dari satu baris data prasarana ke chat widget.
@@ -131,7 +153,7 @@ class ActionCariPrasaranaOlahraga(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        olahraga: Optional[str] = tracker.get_slot("olahraga")
+        olahraga: Optional[str] = get_entity_fresh(tracker, "olahraga")
 
         if not olahraga:
             dispatcher.utter_message(response="utter_ask_olahraga")
@@ -196,7 +218,7 @@ class ActionCariPrasaranaKecamatan(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        kecamatan: Optional[str] = tracker.get_slot("kecamatan")
+        kecamatan: Optional[str] = get_entity_fresh(tracker, "kecamatan")
 
         if not kecamatan:
             dispatcher.utter_message(response="utter_ask_kecamatan")
@@ -262,8 +284,8 @@ class ActionCariPrasaranaOlahragaKecamatan(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        olahraga: Optional[str] = tracker.get_slot("olahraga")
-        kecamatan: Optional[str] = tracker.get_slot("kecamatan")
+        olahraga: Optional[str] = get_entity_fresh(tracker, "olahraga")
+        kecamatan: Optional[str] = get_entity_fresh(tracker, "kecamatan")
 
         if not olahraga:
             dispatcher.utter_message(response="utter_ask_olahraga")
@@ -339,7 +361,7 @@ class ActionDetailPrasarana(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        nama_prasarana: Optional[str] = tracker.get_slot("nama_prasarana")
+        nama_prasarana: Optional[str] = get_entity_fresh(tracker, "nama_prasarana")
 
         if not nama_prasarana:
             dispatcher.utter_message(response="utter_ask_nama_prasarana")
@@ -541,7 +563,7 @@ class ActionTarifPrasarana(Action):
         tracker: Tracker,
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
-        nama_prasarana: Optional[str] = tracker.get_slot("nama_prasarana")
+        nama_prasarana: Optional[str] = get_entity_fresh(tracker, "nama_prasarana")
 
         if not nama_prasarana:
             dispatcher.utter_message(response="utter_ask_nama_prasarana")
