@@ -200,6 +200,10 @@ nlu:
   examples: |
     - bola voli
     - voli
+    - voley
+    - voley
+    - bola voley
+    - bola volley
 
 - synonym: Renang
   examples: |
