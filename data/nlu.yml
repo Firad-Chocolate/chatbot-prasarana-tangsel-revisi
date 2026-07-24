@@ -115,6 +115,12 @@ nlu:
     - ada GOR untuk [badminton](olahraga) tidak?
     - lapangan [badminton](olahraga)
     - lapangan [bola voli](olahraga) ada dimana?
+    - lapangan [voly](olahraga) dimana?
+    - dimana lapangan [voley](olahraga)?
+    - cari lapangan [volly](olahraga)
+    - lapangan [padel](olahraga) dimana?
+    - ada lapangan [padel](olahraga) tidak?
+    - dimana bisa main [padel](olahraga)?
     - dimana lokasi [wall climbing](olahraga)?
     - di mana saja lokasi [GOR](olahraga) yang tersedia?
     - dimana lokasi [GOR](olahraga)?
@@ -200,7 +206,6 @@ nlu:
   examples: |
     - bola voli
     - voli
-    - voley
     - voley
     - bola voley
     - bola volley
