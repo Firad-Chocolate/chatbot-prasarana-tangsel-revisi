@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk — Chatbot Prasarana Olahraga Tangsel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--dark-bg-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 18px;
+            padding: 34px 30px 30px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, .45);
+        }
+        .auth-logo {
+            display: block;
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 18px;
+            object-fit: contain;
+        }
+        .auth-eyebrow {
+            text-align: center;
+            font-size: .72rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--dark-text-muted);
+            margin: 0 0 6px;
+        }
+        .auth-card h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 0 0 26px;
+            color: var(--white);
+        }
+        .auth-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            background: var(--dark-bg-card-header);
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 24px;
+        }
+        .auth-tab {
+            padding: 9px;
+            border: 0;
+            border-radius: 7px;
+            background: transparent;
+            color: var(--dark-text-muted);
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .auth-tab.aktif {
+            background: var(--tangsel-blue-dark);
+            color: var(--white);
+        }
+        .auth-field { margin-bottom: 15px; }
+        .auth-field label {
+            display: block;
+            font-size: .76rem;
+            font-weight: 600;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: var(--dark-text-muted);
+            margin-bottom: 6px;
+        }
+        .auth-field input {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid var(--dark-border);
+            border-radius: 9px;
+            background: var(--dark-bg-messages);
+            color: var(--dark-text-primary);
+            font-family: inherit;
+            font-size: .95rem;
+        }
+        .auth-field input:focus {
+            outline: 2px solid var(--tangsel-gold);
+            outline-offset: 1px;
+            border-color: transparent;
+        }
+        .auth-submit {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border: 0;
+            border-radius: 9px;
+            background: var(--tangsel-gold);
+            color: #1a1a1a;
+            font-family: inherit;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .auth-submit:hover { background: #ffc63d; }
+        .auth-submit:disabled { opacity: .55; cursor: not-allowed; }
+        .auth-pesan {
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: .85rem;
+            line-height: 1.45;
+            margin-bottom: 18px;
+        }
+        .auth-pesan.galat {
+            background: rgba(224, 36, 36, .14);
+            border: 1px solid rgba(224, 36, 36, .45);
+            color: #ffb4b4;
+        }
+        .auth-pesan.sukses {
+            background: rgba(34, 197, 94, .14);
+            border: 1px solid rgba(34, 197, 94, .45);
+            color: #a7f3c8;
+        }
+        .auth-kaki {
+            margin-top: 22px;
+            text-align: center;
+            font-size: .8rem;
+            color: var(--dark-text-muted);
+        }
+        .auth-kaki a { color: var(--tangsel-gold); text-decoration: none; }
+        .tersembunyi { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="auth-page">
+    <main class="auth-card">
+        <img src="image/1782666392920.png" alt="Logo Kota Tangerang Selatan" class="auth-logo">
+        <p class="auth-eyebrow">Pemerintah Kota Tangerang Selatan</p>
+        <h1>Chatbot Prasarana Olahraga</h1>
+
+        <div class="auth-tabs">
+            <button type="button" class="auth-tab aktif" id="tab-masuk">Masuk</button>
+            <button type="button" class="auth-tab" id="tab-daftar">Daftar</button>
+        </div>
+
+        <div id="pesan" class="auth-pesan tersembunyi"></div>
+
+        <!-- Formulir masuk -->
+        <form id="form-masuk">
+            <div class="auth-field">
+                <label for="masuk-email">Email</label>
+                <input type="email" id="masuk-email" autocomplete="email" required>
+            </div>
+            <div class="auth-field">
+                <label for="masuk-sandi">Kata sandi</label>
+                <input type="password" id="masuk-sandi" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="auth-submit" id="tombol-masuk">Masuk</button>
+        </form>
+
+        <!-- Formulir daftar -->
+        <form id="form-daftar" class="tersembunyi">
+            <div class="auth-field">
+                <label for="daftar-nama">Nama lengkap</label>
+                <input type="text" id="daftar-nama" autocomplete="name" required>
+            </div>
+            <div class="auth-field">
+                <label for="daftar-username">Username</label>
+                <input type="text" id="daftar-username" autocomplete="username"
+                       pattern="[a-zA-Z0-9_-]{3,20}"
+                       title="3–20 karakter, hanya huruf, angka, tanda hubung, garis bawah" required>
+            </div>
+            <div class="auth-field">
+                <label for="daftar-email">Email</label>
+                <input type="email" id="daftar-email" autocomplete="email" required>
+            </div>
+            <div class="auth-field">
+                <label for="daftar-sandi">Kata sandi</label>
+                <input type="password" id="daftar-sandi" autocomplete="new-password"
+                       minlength="8" required>
+            </div>
+            <button type="submit" class="auth-submit" id="tombol-daftar">Buat akun</button>
+        </form>
+
+        <p class="auth-kaki">Dinas Pemuda dan Olahraga Kota Tangerang Selatan</p>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script>
+(function () {
+    const elPesan     = document.getElementById("pesan");
+    const formMasuk   = document.getElementById("form-masuk");
+    const formDaftar  = document.getElementById("form-daftar");
+    const tabMasuk    = document.getElementById("tab-masuk");
+    const tabDaftar   = document.getElementById("tab-daftar");
+
+    function tampilkanPesan(teks, jenis) {
+        elPesan.textContent = teks;
+        elPesan.className = "auth-pesan " + jenis;
+    }
+
+    function bersihkanPesan() {
+        elPesan.className = "auth-pesan tersembunyi";
+    }
+
+    /** Menerjemahkan pesan error Supabase ke bahasa yang bisa ditindaklanjuti. */
+    function terjemahkanGalat(pesan) {
+        if (/Invalid login credentials/i.test(pesan))
+            return "Email atau kata sandi tidak cocok. Periksa kembali.";
+        if (/Email not confirmed/i.test(pesan))
+            return "Email belum dikonfirmasi. Buka tautan verifikasi di kotak masuk Anda.";
+        if (/User already registered/i.test(pesan))
+            return "Email ini sudah terdaftar. Gunakan tab Masuk.";
+        if (/Password should be/i.test(pesan))
+            return "Kata sandi minimal 8 karakter.";
+        if (/rate limit|too many/i.test(pesan))
+            return "Terlalu banyak percobaan. Tunggu beberapa menit.";
+        return pesan;
+    }
+
+    /** Mengarahkan ke halaman sesuai peran. */
+    async function arahkanSesuaiPeran() {
+        const hasil = await getSesiProfil();
+        if (!hasil) {
+            tampilkanPesan(
+                "Akun berhasil masuk tetapi profil belum terbentuk. " +
+                "Hubungi admin untuk memeriksa tabel profiles.", "galat");
+            return;
+        }
+        window.location.replace(
+            BASE + (hasil.profil.role === "admin" ? "admin.html" : "index.html")
+        );
+    }
+
+    // --- Perpindahan tab ---
+    tabMasuk.addEventListener("click", function () {
+        tabMasuk.classList.add("aktif");
+        tabDaftar.classList.remove("aktif");
+        formMasuk.classList.remove("tersembunyi");
+        formDaftar.classList.add("tersembunyi");
+        bersihkanPesan();
+    });
+
+    tabDaftar.addEventListener("click", function () {
+        tabDaftar.classList.add("aktif");
+        tabMasuk.classList.remove("aktif");
+        formDaftar.classList.remove("tersembunyi");
+        formMasuk.classList.add("tersembunyi");
+        bersihkanPesan();
+    });
+
+    // --- Masuk ---
+    formMasuk.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const tombol = document.getElementById("tombol-masuk");
+        tombol.disabled = true;
+        tombol.textContent = "Memeriksa…";
+        bersihkanPesan();
+
+        const { error } = await sb.auth.signInWithPassword({
+            email: document.getElementById("masuk-email").value.trim(),
+            password: document.getElementById("masuk-sandi").value
+        });
+
+        if (error) {
+            tampilkanPesan(terjemahkanGalat(error.message), "galat");
+            tombol.disabled = false;
+            tombol.textContent = "Masuk";
+            return;
+        }
+        await arahkanSesuaiPeran();
+    });
+
+    // --- Daftar ---
+    formDaftar.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const tombol = document.getElementById("tombol-daftar");
+        tombol.disabled = true;
+        tombol.textContent = "Memproses…";
+        bersihkanPesan();
+
+        const username = document.getElementById("daftar-username").value.trim();
+
+        // Peran tidak dikirim dari sini. Trigger handle_new_user() di database
+        // selalu menetapkan role 'user', sehingga tidak ada yang bisa
+        // mendaftarkan dirinya sebagai admin lewat formulir publik.
+        const { data, error } = await sb.auth.signUp({
+            email: document.getElementById("daftar-email").value.trim(),
+            password: document.getElementById("daftar-sandi").value,
+            options: {
+                data: {
+                    username: username,
+                    nama: document.getElementById("daftar-nama").value.trim()
+                }
+            }
+        });
+
+        if (error) {
+            tampilkanPesan(terjemahkanGalat(error.message), "galat");
+            tombol.disabled = false;
+            tombol.textContent = "Buat akun";
+            return;
+        }
+
+        // Kalau verifikasi email aktif, session belum terbentuk setelah signUp.
+        if (!data.session) {
+            tampilkanPesan(
+                "Akun dibuat. Buka email Anda dan klik tautan verifikasi, " +
+                "lalu kembali ke sini untuk masuk.", "sukses");
+            tombol.disabled = false;
+            tombol.textContent = "Buat akun";
+            return;
+        }
+        await arahkanSesuaiPeran();
+    });
+
+    // Kalau sudah punya sesi aktif, langsung arahkan tanpa login ulang.
+    (async function () {
+        const hasil = await getSesiProfil();
+        if (hasil) {
+            window.location.replace(
+                BASE + (hasil.profil.role === "admin" ? "admin.html" : "index.html")
+            );
+        }
+    })();
+})();
+</script>
+</body>
+</html>
