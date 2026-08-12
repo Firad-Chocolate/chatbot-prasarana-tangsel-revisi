@@ -522,3 +522,39 @@ body::before {
     height: 460px !important; /* Tetap mengunci tinggi statis di layar HP */
   }
 }
+/* ==========================================================================
+   Identitas pengguna & tombol keluar di navbar (ditambahkan bersama fitur login)
+   ========================================================================== */
+
+.navbar-kanan {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.navbar-user {
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--dark-text-muted);
+}
+
+.navbar-keluar {
+  padding: 7px 14px;
+  border: 1px solid rgba(224, 36, 36, .5);
+  border-radius: 7px;
+  background: transparent;
+  color: #ff9d9d;
+  font-family: inherit;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navbar-keluar:hover {
+  background: rgba(224, 36, 36, .14);
+}
+
+@media (max-width: 560px) {
+  .navbar-user { display: none; }
+}
