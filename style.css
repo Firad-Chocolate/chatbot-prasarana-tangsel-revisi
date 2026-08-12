@@ -340,6 +340,17 @@ body::before {
   border-bottom-left-radius: 4px;
 }
 
+/* Tautan Google Maps di dalam jawaban bot */
+.msg-link {
+  color: #ffd700;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.msg-link:hover {
+  color: #ffe95c;
+}
+
 .msg-bubble-user {
   background: var(--dark-bubble-user);
   color: var(--white);
