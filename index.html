@@ -13,7 +13,11 @@
             <img src="image/1782666392920.png" alt="Logo Kota Tangerang Selatan" class="navbar-logo">
             <span class="navbar-title">Chatbot Prasarana Olahraga Tangsel</span>
         </div>
-        <a href="#chat-container" class="navbar-btn">Go to Chatbot</a>
+        <div class="navbar-kanan">
+            <span class="navbar-user" id="navbar-user"></span>
+            <a href="#chat-container" class="navbar-btn">Go to Chatbot</a>
+            <button type="button" class="navbar-keluar" id="tombol-keluar">Keluar</button>
+        </div>
     </div>
 
     <div class="hero-navy">
@@ -66,9 +70,23 @@
         <p class="footer-note">Basis data dikelola secara berkala oleh Dinas Pemuda dan Olahraga (DISPORA) Kota Tangerang Selatan.</p>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
     <script>
-    (function () {
+    (async function () {
+        // Wajib login. Yang belum masuk dilempar ke halaman login.
+        var sesi = await wajibLogin("user");
+        if (!sesi) return;
+
+        document.getElementById("navbar-user").textContent = sesi.profil.nama;
+        document.getElementById("tombol-keluar").addEventListener("click", keluar);
+
         var RASA_ENDPOINT = "/webhooks/rest/webhook";
+
+        // sender_id inilah yang disimpan actions.py ke kolom session_id,
+        // sehingga riwayat chat menjadi milik masing-masing pengguna.
+        // Contoh nilai: "user-firad"
+        var SENDER_ID = "user-" + sesi.profil.username;
         var messagesEl = document.getElementById("chat-messages");
         var inputEl = document.getElementById("chat-input");
         var sendBtn = document.getElementById("chat-send");
@@ -187,7 +205,7 @@
             fetch(RASA_ENDPOINT, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sender: "web-user", message: text })
+                body: JSON.stringify({ sender: SENDER_ID, message: text })
             })
                 .then(function (res) {
                     if (!res.ok) throw new Error("Request gagal");
@@ -222,8 +240,9 @@
         addBubble(DISCLAIMER_TEXT, "bot");
         addQuickReplies();
 
-        localStorage.clear();
-        sessionStorage.clear();
+        // Catatan: localStorage.clear() dihapus dari sini.
+        // Supabase menyimpan sesi login di localStorage, jadi membersihkannya
+        // akan langsung mengeluarkan pengguna setiap halaman dimuat.
     })();
     </script>
 </body>
