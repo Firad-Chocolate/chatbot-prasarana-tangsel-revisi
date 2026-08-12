@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin — Prasarana Olahraga Tangsel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .adm-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            padding: 13px 22px;
+            background: var(--dark-bg-card-header);
+            border-bottom: 1px solid var(--dark-border);
+        }
+        .adm-brand { display: flex; align-items: center; gap: 11px; }
+        .adm-brand img { width: 34px; height: 34px; object-fit: contain; }
+        .adm-brand span {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            color: var(--white);
+            letter-spacing: .01em;
+        }
+        .adm-user { display: flex; align-items: center; gap: 13px; font-size: .84rem; }
+        .adm-user .nama { color: var(--dark-text-muted); }
+        .adm-keluar {
+            padding: 7px 14px;
+            border: 1px solid rgba(224, 36, 36, .5);
+            border-radius: 7px;
+            background: transparent;
+            color: #ff9d9d;
+            font-family: inherit;
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .adm-keluar:hover { background: rgba(224, 36, 36, .14); }
+
+        .adm-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 14px 22px 0;
+            flex-wrap: wrap;
+        }
+        .adm-tab {
+            padding: 9px 17px;
+            border: 1px solid transparent;
+            border-radius: 9px 9px 0 0;
+            background: transparent;
+            color: var(--dark-text-muted);
+            font-family: inherit;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .adm-tab.aktif {
+            background: var(--dark-bg-card);
+            border-color: var(--dark-border);
+            border-bottom-color: var(--dark-bg-card);
+            color: var(--white);
+        }
+
+        .adm-main { padding: 0 22px 46px; }
+        .adm-panel {
+            background: var(--dark-bg-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 0 12px 12px 12px;
+            padding: 22px;
+        }
+        .adm-panel h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.02rem;
+            color: var(--white);
+            margin: 0 0 16px;
+        }
+        .adm-form {
+            background: var(--dark-bg-messages);
+            border: 1px solid var(--dark-border);
+            border-radius: 11px;
+            padding: 18px;
+            margin-bottom: 26px;
+        }
+        .adm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+            gap: 13px;
+            margin-bottom: 14px;
+        }
+        .adm-field label {
+            display: block;
+            font-size: .73rem;
+            font-weight: 600;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: var(--dark-text-muted);
+            margin-bottom: 5px;
+        }
+        .adm-field input,
+        .adm-field select,
+        .adm-field textarea {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            background: var(--dark-bg-card);
+            color: var(--dark-text-primary);
+            font-family: inherit;
+            font-size: .88rem;
+        }
+        .adm-field textarea { min-height: 62px; resize: vertical; }
+        .adm-field input:focus,
+        .adm-field select:focus,
+        .adm-field textarea:focus {
+            outline: 2px solid var(--tangsel-gold);
+            outline-offset: 1px;
+            border-color: transparent;
+        }
+        .adm-btn {
+            padding: 9px 19px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--tangsel-gold);
+            color: #1a1a1a;
+            font-family: inherit;
+            font-size: .86rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .adm-btn:hover { background: #ffc63d; }
+        .adm-btn:disabled { opacity: .55; cursor: not-allowed; }
+        .adm-btn-batal {
+            padding: 9px 17px;
+            margin-left: 8px;
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--dark-text-muted);
+            font-family: inherit;
+            font-size: .86rem;
+            cursor: pointer;
+        }
+
+        .adm-tabel-bungkus { overflow-x: auto; }
+        table.adm-tabel {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .84rem;
+        }
+        table.adm-tabel th {
+            text-align: left;
+            padding: 9px 8px;
+            border-bottom: 1px solid var(--dark-border);
+            font-size: .71rem;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--dark-text-muted);
+            white-space: nowrap;
+        }
+        table.adm-tabel td {
+            padding: 9px 8px;
+            border-bottom: 1px solid rgba(46, 61, 87, .5);
+            vertical-align: top;
+            color: var(--dark-text-primary);
+        }
+        .aksi-ubah {
+            background: none;
+            border: 0;
+            padding: 2px 6px;
+            color: var(--tangsel-gold);
+            font-family: inherit;
+            font-size: .83rem;
+            cursor: pointer;
+        }
+        .aksi-hapus {
+            background: none;
+            border: 0;
+            padding: 2px 6px;
+            color: #ff9d9d;
+            font-family: inherit;
+            font-size: .83rem;
+            cursor: pointer;
+        }
+        .adm-kabar {
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: .85rem;
+            margin-bottom: 16px;
+        }
+        .adm-kabar.sukses {
+            background: rgba(34, 197, 94, .14);
+            border: 1px solid rgba(34, 197, 94, .45);
+            color: #a7f3c8;
+        }
+        .adm-kabar.galat {
+            background: rgba(224, 36, 36, .14);
+            border: 1px solid rgba(224, 36, 36, .45);
+            color: #ffb4b4;
+        }
+        .adm-kosong {
+            padding: 22px 8px;
+            text-align: center;
+            color: var(--dark-text-muted);
+            font-size: .87rem;
+        }
+        .adm-cari {
+            width: 100%;
+            max-width: 320px;
+            padding: 9px 12px;
+            margin-bottom: 14px;
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            background: var(--dark-bg-messages);
+            color: var(--dark-text-primary);
+            font-family: inherit;
+            font-size: .87rem;
+        }
+        .lencana {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 99px;
+            background: rgba(148, 163, 184, .18);
+            font-size: .74rem;
+        }
+        .lencana.admin {
+            background: rgba(244, 180, 26, .2);
+            color: var(--tangsel-gold);
+            font-weight: 700;
+        }
+        .sel-panjang {
+            max-width: 300px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .tersembunyi { display: none !important; }
+        #layar-muat {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: var(--dark-text-muted);
+            font-size: .92rem;
+        }
+    </style>
+</head>
+<body>
+
+<div id="layar-muat">Memeriksa akses…</div>
+
+<div id="isi-admin" class="tersembunyi">
+    <div class="adm-topbar">
+        <div class="adm-brand">
+            <img src="image/1782666392920.png" alt="Logo Kota Tangerang Selatan">
+            <span>Panel Admin — Prasarana Olahraga</span>
+        </div>
+        <div class="adm-user">
+            <span class="nama" id="label-admin"></span>
+            <button type="button" class="adm-keluar" id="tombol-keluar">Keluar</button>
+        </div>
+    </div>
+
+    <div class="adm-tabs">
+        <button type="button" class="adm-tab aktif" data-tab="prasarana">Prasarana</button>
+        <button type="button" class="adm-tab" data-tab="tarif">Tarif Retribusi</button>
+        <button type="button" class="adm-tab" data-tab="riwayat">Riwayat Chat</button>
+        <button type="button" class="adm-tab" data-tab="pengguna">Pengguna</button>
+    </div>
+
+    <div class="adm-main">
+        <div class="adm-panel">
+            <div id="kabar" class="adm-kabar tersembunyi"></div>
+
+            <!-- ============ TAB PRASARANA ============ -->
+            <section id="tab-prasarana">
+                <h2 id="judul-form-prasarana">Tambah prasarana</h2>
+                <form class="adm-form" id="form-prasarana">
+                    <input type="hidden" id="pr-id">
+                    <div class="adm-grid">
+                        <div class="adm-field">
+                            <label for="pr-nama">Nama prasarana *</label>
+                            <input type="text" id="pr-nama" required>
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-olahraga">Olahraga *</label>
+                            <input type="text" id="pr-olahraga" required>
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-kecamatan">Kecamatan *</label>
+                            <input type="text" id="pr-kecamatan" required>
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-status">Status</label>
+                            <select id="pr-status">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Tidak Aktif">Tidak Aktif</option>
+                                <option value="Renovasi">Renovasi</option>
+                            </select>
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-telepon">Nomor pengelola</label>
+                            <input type="text" id="pr-telepon">
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-maps">Link Google Maps</label>
+                            <input type="url" id="pr-maps">
+                        </div>
+                    </div>
+                    <div class="adm-field" style="margin-bottom:14px">
+                        <label for="pr-alamat">Alamat *</label>
+                        <textarea id="pr-alamat" required></textarea>
+                    </div>
+                    <div class="adm-grid">
+                        <div class="adm-field">
+                            <label for="pr-gbr1">Link gambar 1</label>
+                            <input type="url" id="pr-gbr1">
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-gbr2">Link gambar 2</label>
+                            <input type="url" id="pr-gbr2">
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-gbr3">Link gambar 3</label>
+                            <input type="url" id="pr-gbr3">
+                        </div>
+                    </div>
+                    <div class="adm-grid">
+                        <div class="adm-field">
+                            <label for="pr-hm1">Harga member sesi 1</label>
+                            <input type="number" id="pr-hm1" min="0">
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-hm2">Harga member sesi 2</label>
+                            <input type="number" id="pr-hm2" min="0">
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-hn1">Harga non-member sesi 1</label>
+                            <input type="number" id="pr-hn1" min="0">
+                        </div>
+                        <div class="adm-field">
+                            <label for="pr-hn2">Harga non-member sesi 2</label>
+                            <input type="number" id="pr-hn2" min="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="adm-btn" id="pr-simpan">Tambah prasarana</button>
+                    <button type="button" class="adm-btn-batal tersembunyi" id="pr-batal">Batal</button>
+                </form>
+
+                <h2>Daftar prasarana (<span id="pr-jumlah">0</span>)</h2>
+                <input type="search" class="adm-cari" id="pr-cari"
+                       placeholder="Cari nama, olahraga, atau kecamatan…">
+                <div class="adm-tabel-bungkus">
+                    <table class="adm-tabel">
+                        <thead>
+                            <tr>
+                                <th>Nama</th><th>Olahraga</th><th>Kecamatan</th>
+                                <th>Status</th><th>Harga</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pr-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ============ TAB TARIF ============ -->
+            <section id="tab-tarif" class="tersembunyi">
+                <h2 id="judul-form-tarif">Tambah tarif</h2>
+                <form class="adm-form" id="form-tarif">
+                    <input type="hidden" id="tr-id">
+                    <div class="adm-grid">
+                        <div class="adm-field">
+                            <label for="tr-prasarana">Prasarana *</label>
+                            <select id="tr-prasarana" required></select>
+                        </div>
+                        <div class="adm-field">
+                            <label for="tr-pengunjung">Jenis pengunjung *</label>
+                            <input type="text" id="tr-pengunjung" required
+                                   placeholder="Pengunjung / Rombongan">
+                        </div>
+                        <div class="adm-field">
+                            <label for="tr-kategori">Kategori *</label>
+                            <input type="text" id="tr-kategori" required
+                                   placeholder="Anak / Dewasa / Sekolah">
+                        </div>
+                        <div class="adm-field">
+                            <label for="tr-hari">Tipe hari</label>
+                            <select id="tr-hari">
+                                <option value="">— tidak ditentukan —</option>
+                                <option value="weekday">weekday</option>
+                                <option value="weekend">weekend</option>
+                            </select>
+                        </div>
+                        <div class="adm-field">
+                            <label for="tr-tarif">Tarif (Rp) *</label>
+                            <input type="number" id="tr-tarif" min="0" required>
+                        </div>
+                        <div class="adm-field">
+                            <label for="tr-satuan">Satuan *</label>
+                            <input type="text" id="tr-satuan" required placeholder="orang / rombongan">
+                        </div>
+                    </div>
+                    <div class="adm-field" style="margin-bottom:14px">
+                        <label for="tr-keterangan">Keterangan tambahan</label>
+                        <input type="text" id="tr-keterangan">
+                    </div>
+                    <button type="submit" class="adm-btn" id="tr-simpan">Tambah tarif</button>
+                    <button type="button" class="adm-btn-batal tersembunyi" id="tr-batal">Batal</button>
+                </form>
+
+                <h2>Daftar tarif (<span id="tr-jumlah">0</span>)</h2>
+                <div class="adm-tabel-bungkus">
+                    <table class="adm-tabel">
+                        <thead>
+                            <tr>
+                                <th>Prasarana</th><th>Pengunjung</th><th>Kategori</th>
+                                <th>Hari</th><th>Tarif</th><th>Satuan</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tr-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ============ TAB RIWAYAT ============ -->
+            <section id="tab-riwayat" class="tersembunyi">
+                <h2>Riwayat percakapan (<span id="rw-jumlah">0</span> terbaru)</h2>
+                <input type="search" class="adm-cari" id="rw-cari"
+                       placeholder="Cari isi percakapan atau nama pengguna…">
+                <div class="adm-tabel-bungkus">
+                    <table class="adm-tabel">
+                        <thead>
+                            <tr><th>Waktu</th><th>Pengguna</th><th>Percakapan</th><th></th></tr>
+                        </thead>
+                        <tbody id="rw-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ============ TAB PENGGUNA ============ -->
+            <section id="tab-pengguna" class="tersembunyi">
+                <h2>Pengguna terdaftar (<span id="pg-jumlah">0</span>)</h2>
+                <div class="adm-tabel-bungkus">
+                    <table class="adm-tabel">
+                        <thead>
+                            <tr><th>Username</th><th>Nama</th><th>Peran</th><th>Terdaftar</th><th></th></tr>
+                        </thead>
+                        <tbody id="pg-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script>
+(async function () {
+    // Penjaga akses. User biasa yang membuka halaman ini dilempar ke chatbot.
+    // Pertahanan sesungguhnya ada di RLS database, bukan di baris ini —
+    // ini hanya supaya pengalamannya tidak membingungkan.
+    const sesi = await wajibLogin("admin");
+    if (!sesi) return;
+
+    document.getElementById("layar-muat").classList.add("tersembunyi");
+    document.getElementById("isi-admin").classList.remove("tersembunyi");
+    document.getElementById("label-admin").textContent =
+        sesi.profil.nama + " (admin)";
+    document.getElementById("tombol-keluar").addEventListener("click", keluar);
+
+    const elKabar = document.getElementById("kabar");
+    let daftarPrasarana = [];
+    let daftarTarif = [];
+    let daftarRiwayat = [];
+
+    function kabar(teks, jenis) {
+        elKabar.textContent = teks;
+        elKabar.className = "adm-kabar " + jenis;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(function () { elKabar.classList.add("tersembunyi"); }, 5000);
+    }
+
+    /** Membuat sel tabel dengan textContent — tidak pernah innerHTML,
+        supaya isi database dan ketikan user tidak bisa jadi markup. */
+    function sel(teks, kelas) {
+        const td = document.createElement("td");
+        td.textContent = teks == null || teks === "" ? "—" : String(teks);
+        if (kelas) td.className = kelas;
+        return td;
+    }
+
+    function rupiah(n) {
+        if (n == null || n === "") return null;
+        return "Rp" + Number(n).toLocaleString("id-ID");
+    }
+
+    function nilaiAtauNull(id) {
+        const v = document.getElementById(id).value.trim();
+        return v === "" ? null : v;
+    }
+
+    function angkaAtauNull(id) {
+        const v = document.getElementById(id).value.trim();
+        return v === "" ? null : Number(v);
+    }
+
+    // ---------- Perpindahan tab ----------
+    document.querySelectorAll(".adm-tab").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            document.querySelectorAll(".adm-tab").forEach(function (b) {
+                b.classList.remove("aktif");
+            });
+            btn.classList.add("aktif");
+            ["prasarana", "tarif", "riwayat", "pengguna"].forEach(function (t) {
+                document.getElementById("tab-" + t)
+                    .classList.toggle("tersembunyi", t !== btn.dataset.tab);
+            });
+        });
+    });
+
+    // ================= PRASARANA =================
+    async function muatPrasarana() {
+        const { data, error } = await sb
+            .from("prasarana_olahraga")
+            .select("*")
+            .order("nama_prasarana");
+
+        if (error) { kabar("Gagal memuat prasarana: " + error.message, "galat"); return; }
+        daftarPrasarana = data || [];
+        gambarPrasarana();
+        isiPilihanPrasarana();
+    }
+
+    function gambarPrasarana() {
+        const cari = document.getElementById("pr-cari").value.toLowerCase();
+        const tbody = document.getElementById("pr-tbody");
+        tbody.textContent = "";
+
+        const hasil = daftarPrasarana.filter(function (r) {
+            if (!cari) return true;
+            return (r.nama_prasarana + " " + r.olahraga + " " + r.kecamatan)
+                .toLowerCase().includes(cari);
+        });
+
+        document.getElementById("pr-jumlah").textContent = daftarPrasarana.length;
+
+        if (hasil.length === 0) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 6;
+            td.className = "adm-kosong";
+            td.textContent = daftarPrasarana.length === 0
+                ? "Belum ada data prasarana. Tambahkan lewat formulir di atas."
+                : "Tidak ada yang cocok dengan pencarian.";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        hasil.forEach(function (r) {
+            const tr = document.createElement("tr");
+            tr.appendChild(sel(r.nama_prasarana));
+            tr.appendChild(sel(r.olahraga));
+            tr.appendChild(sel(r.kecamatan));
+
+            const tdStatus = document.createElement("td");
+            const sp = document.createElement("span");
+            sp.className = "lencana";
+            sp.textContent = r.status || "—";
+            tdStatus.appendChild(sp);
+            tr.appendChild(tdStatus);
+
+            const harga = rupiah(r.harga_non_member_sesi_1) || rupiah(r.harga_member_sesi_1);
+            tr.appendChild(sel(harga));
+
+            const tdAksi = document.createElement("td");
+            tdAksi.style.whiteSpace = "nowrap";
+            const bUbah = document.createElement("button");
+            bUbah.className = "aksi-ubah";
+            bUbah.textContent = "Ubah";
+            bUbah.addEventListener("click", function () { isiFormPrasarana(r); });
+            const bHapus = document.createElement("button");
+            bHapus.className = "aksi-hapus";
+            bHapus.textContent = "Hapus";
+            bHapus.addEventListener("click", function () { hapusPrasarana(r); });
+            tdAksi.appendChild(bUbah);
+            tdAksi.appendChild(bHapus);
+            tr.appendChild(tdAksi);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function isiFormPrasarana(r) {
+        document.getElementById("pr-id").value = r.id;
+        document.getElementById("pr-nama").value = r.nama_prasarana || "";
+        document.getElementById("pr-olahraga").value = r.olahraga || "";
+        document.getElementById("pr-kecamatan").value = r.kecamatan || "";
+        document.getElementById("pr-status").value = r.status || "Aktif";
+        document.getElementById("pr-telepon").value = r.nomor_pengelola || "";
+        document.getElementById("pr-maps").value = r.google_maps_link || "";
+        document.getElementById("pr-alamat").value = r.alamat || "";
+        document.getElementById("pr-gbr1").value = r.link_gambar_1 || "";
+        document.getElementById("pr-gbr2").value = r.link_gambar_2 || "";
+        document.getElementById("pr-gbr3").value = r.link_gambar_3 || "";
+        document.getElementById("pr-hm1").value = r.harga_member_sesi_1 ?? "";
+        document.getElementById("pr-hm2").value = r.harga_member_sesi_2 ?? "";
+        document.getElementById("pr-hn1").value = r.harga_non_member_sesi_1 ?? "";
+        document.getElementById("pr-hn2").value = r.harga_non_member_sesi_2 ?? "";
+
+        document.getElementById("judul-form-prasarana").textContent =
+            "Ubah: " + r.nama_prasarana;
+        document.getElementById("pr-simpan").textContent = "Simpan perubahan";
+        document.getElementById("pr-batal").classList.remove("tersembunyi");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetFormPrasarana() {
+        document.getElementById("form-prasarana").reset();
+        document.getElementById("pr-id").value = "";
+        document.getElementById("judul-form-prasarana").textContent = "Tambah prasarana";
+        document.getElementById("pr-simpan").textContent = "Tambah prasarana";
+        document.getElementById("pr-batal").classList.add("tersembunyi");
+    }
+
+    document.getElementById("pr-batal").addEventListener("click", resetFormPrasarana);
+    document.getElementById("pr-cari").addEventListener("input", gambarPrasarana);
+
+    document.getElementById("form-prasarana").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const tombol = document.getElementById("pr-simpan");
+        tombol.disabled = true;
+
+        const baris = {
+            nama_prasarana: document.getElementById("pr-nama").value.trim(),
+            olahraga: document.getElementById("pr-olahraga").value.trim(),
+            kecamatan: document.getElementById("pr-kecamatan").value.trim(),
+            alamat: document.getElementById("pr-alamat").value.trim(),
+            status: document.getElementById("pr-status").value,
+            nomor_pengelola: nilaiAtauNull("pr-telepon"),
+            google_maps_link: nilaiAtauNull("pr-maps"),
+            link_gambar_1: nilaiAtauNull("pr-gbr1"),
+            link_gambar_2: nilaiAtauNull("pr-gbr2"),
+            link_gambar_3: nilaiAtauNull("pr-gbr3"),
+            harga_member_sesi_1: angkaAtauNull("pr-hm1"),
+            harga_member_sesi_2: angkaAtauNull("pr-hm2"),
+            harga_non_member_sesi_1: angkaAtauNull("pr-hn1"),
+            harga_non_member_sesi_2: angkaAtauNull("pr-hn2")
+        };
+
+        const id = document.getElementById("pr-id").value;
+        const { error } = id
+            ? await sb.from("prasarana_olahraga").update(baris).eq("id", id)
+            : await sb.from("prasarana_olahraga").insert(baris);
+
+        tombol.disabled = false;
+
+        if (error) {
+            // Kombinasi nama_prasarana + olahraga bersifat unik di database.
+            const pesan = /duplicate key/i.test(error.message)
+                ? "Prasarana dengan nama dan cabang olahraga itu sudah ada."
+                : error.message;
+            kabar("Gagal menyimpan: " + pesan, "galat");
+            return;
+        }
+
+        kabar(id ? "Perubahan tersimpan." : "Prasarana ditambahkan.", "sukses");
+        resetFormPrasarana();
+        await muatPrasarana();
+    });
+
+    async function hapusPrasarana(r) {
+        if (!confirm("Hapus \"" + r.nama_prasarana + " — " + r.olahraga + "\"?\n\n" +
+                     "Data tarif yang terkait juga akan terpengaruh.")) return;
+
+        const { error } = await sb.from("prasarana_olahraga").delete().eq("id", r.id);
+        if (error) { kabar("Gagal menghapus: " + error.message, "galat"); return; }
+        kabar("Prasarana dihapus.", "sukses");
+        await muatPrasarana();
+        await muatTarif();
+    }
+
+    // ================= TARIF =================
+    function isiPilihanPrasarana() {
+        const sel = document.getElementById("tr-prasarana");
+        const terpilih = sel.value;
+        sel.textContent = "";
+
+        const kosong = document.createElement("option");
+        kosong.value = "";
+        kosong.textContent = "— pilih prasarana —";
+        sel.appendChild(kosong);
+
+        daftarPrasarana.forEach(function (r) {
+            const opt = document.createElement("option");
+            opt.value = r.id;
+            opt.textContent = r.nama_prasarana + " — " + r.olahraga;
+            sel.appendChild(opt);
+        });
+        sel.value = terpilih;
+    }
+
+    function namaPrasarana(id) {
+        const p = daftarPrasarana.find(function (r) { return r.id === id; });
+        return p ? p.nama_prasarana + " — " + p.olahraga : "(tidak ditemukan)";
+    }
+
+    async function muatTarif() {
+        const { data, error } = await sb
+            .from("tarif_retribusi")
+            .select("*")
+            .order("prasarana_id");
+
+        if (error) { kabar("Gagal memuat tarif: " + error.message, "galat"); return; }
+        daftarTarif = data || [];
+        gambarTarif();
+    }
+
+    function gambarTarif() {
+        const tbody = document.getElementById("tr-tbody");
+        tbody.textContent = "";
+        document.getElementById("tr-jumlah").textContent = daftarTarif.length;
+
+        if (daftarTarif.length === 0) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 7;
+            td.className = "adm-kosong";
+            td.textContent = "Belum ada data tarif.";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        daftarTarif.forEach(function (r) {
+            const tr = document.createElement("tr");
+            tr.appendChild(sel(namaPrasarana(r.prasarana_id)));
+            tr.appendChild(sel(r.jenis_pengunjung));
+            tr.appendChild(sel(r.kategori));
+            tr.appendChild(sel(r.tipe_hari));
+            tr.appendChild(sel(rupiah(r.tarif)));
+            tr.appendChild(sel(r.satuan));
+
+            const tdAksi = document.createElement("td");
+            tdAksi.style.whiteSpace = "nowrap";
+            const bUbah = document.createElement("button");
+            bUbah.className = "aksi-ubah";
+            bUbah.textContent = "Ubah";
+            bUbah.addEventListener("click", function () { isiFormTarif(r); });
+            const bHapus = document.createElement("button");
+            bHapus.className = "aksi-hapus";
+            bHapus.textContent = "Hapus";
+            bHapus.addEventListener("click", function () { hapusTarif(r); });
+            tdAksi.appendChild(bUbah);
+            tdAksi.appendChild(bHapus);
+            tr.appendChild(tdAksi);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function isiFormTarif(r) {
+        document.getElementById("tr-id").value = r.id;
+        document.getElementById("tr-prasarana").value = r.prasarana_id ?? "";
+        document.getElementById("tr-pengunjung").value = r.jenis_pengunjung || "";
+        document.getElementById("tr-kategori").value = r.kategori || "";
+        document.getElementById("tr-hari").value = r.tipe_hari || "";
+        document.getElementById("tr-tarif").value = r.tarif ?? "";
+        document.getElementById("tr-satuan").value = r.satuan || "";
+        document.getElementById("tr-keterangan").value = r.keterangan_tambahan || "";
+
+        document.getElementById("judul-form-tarif").textContent = "Ubah tarif";
+        document.getElementById("tr-simpan").textContent = "Simpan perubahan";
+        document.getElementById("tr-batal").classList.remove("tersembunyi");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetFormTarif() {
+        document.getElementById("form-tarif").reset();
+        document.getElementById("tr-id").value = "";
+        document.getElementById("judul-form-tarif").textContent = "Tambah tarif";
+        document.getElementById("tr-simpan").textContent = "Tambah tarif";
+        document.getElementById("tr-batal").classList.add("tersembunyi");
+    }
+
+    document.getElementById("tr-batal").addEventListener("click", resetFormTarif);
+
+    document.getElementById("form-tarif").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const tombol = document.getElementById("tr-simpan");
+        tombol.disabled = true;
+
+        const baris = {
+            prasarana_id: Number(document.getElementById("tr-prasarana").value),
+            jenis_pengunjung: document.getElementById("tr-pengunjung").value.trim(),
+            kategori: document.getElementById("tr-kategori").value.trim(),
+            tipe_hari: nilaiAtauNull("tr-hari"),
+            keterangan_tambahan: nilaiAtauNull("tr-keterangan"),
+            tarif: Number(document.getElementById("tr-tarif").value),
+            satuan: document.getElementById("tr-satuan").value.trim()
+        };
+
+        const id = document.getElementById("tr-id").value;
+        const { error } = id
+            ? await sb.from("tarif_retribusi").update(baris).eq("id", id)
+            : await sb.from("tarif_retribusi").insert(baris);
+
+        tombol.disabled = false;
+
+        if (error) { kabar("Gagal menyimpan: " + error.message, "galat"); return; }
+        kabar(id ? "Perubahan tersimpan." : "Tarif ditambahkan.", "sukses");
+        resetFormTarif();
+        await muatTarif();
+    });
+
+    async function hapusTarif(r) {
+        if (!confirm("Hapus tarif ini?")) return;
+        const { error } = await sb.from("tarif_retribusi").delete().eq("id", r.id);
+        if (error) { kabar("Gagal menghapus: " + error.message, "galat"); return; }
+        kabar("Tarif dihapus.", "sukses");
+        await muatTarif();
+    }
+
+    // ================= RIWAYAT CHAT =================
+    async function muatRiwayat() {
+        const { data, error } = await sb
+            .from("history_chat_chatbot")
+            .select("*")
+            .order("id", { ascending: false })
+            .limit(200);
+
+        if (error) { kabar("Gagal memuat riwayat: " + error.message, "galat"); return; }
+        daftarRiwayat = data || [];
+        gambarRiwayat();
+    }
+
+    function gambarRiwayat() {
+        const cari = document.getElementById("rw-cari").value.toLowerCase();
+        const tbody = document.getElementById("rw-tbody");
+        tbody.textContent = "";
+
+        const hasil = daftarRiwayat.filter(function (r) {
+            if (!cari) return true;
+            return ((r.session_id || "") + " " + (r.respon_chatbot || ""))
+                .toLowerCase().includes(cari);
+        });
+
+        document.getElementById("rw-jumlah").textContent = daftarRiwayat.length;
+
+        if (hasil.length === 0) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 4;
+            td.className = "adm-kosong";
+            td.textContent = daftarRiwayat.length === 0
+                ? "Belum ada percakapan tercatat."
+                : "Tidak ada yang cocok dengan pencarian.";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        hasil.forEach(function (r) {
+            const tr = document.createElement("tr");
+
+            const waktu = r.tanggal_chat
+                ? new Date(r.tanggal_chat).toLocaleString("id-ID",
+                    { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
+                : "—";
+            const tdWaktu = sel(waktu);
+            tdWaktu.style.whiteSpace = "nowrap";
+            tr.appendChild(tdWaktu);
+
+            tr.appendChild(sel(r.session_id));
+            tr.appendChild(sel(r.respon_chatbot, "sel-panjang"));
+
+            const tdAksi = document.createElement("td");
+            const bHapus = document.createElement("button");
+            bHapus.className = "aksi-hapus";
+            bHapus.textContent = "Hapus";
+            bHapus.addEventListener("click", async function () {
+                if (!confirm("Hapus riwayat ini?")) return;
+                const { error } = await sb
+                    .from("history_chat_chatbot").delete().eq("id", r.id);
+                if (error) { kabar("Gagal menghapus: " + error.message, "galat"); return; }
+                kabar("Riwayat dihapus.", "sukses");
+                await muatRiwayat();
+            });
+            tdAksi.appendChild(bHapus);
+            tr.appendChild(tdAksi);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById("rw-cari").addEventListener("input", gambarRiwayat);
+
+    // ================= PENGGUNA =================
+    async function muatPengguna() {
+        const { data, error } = await sb
+            .from("profiles")
+            .select("id, username, nama, role, created_at")
+            .order("created_at", { ascending: false });
+
+        if (error) { kabar("Gagal memuat pengguna: " + error.message, "galat"); return; }
+
+        const tbody = document.getElementById("pg-tbody");
+        tbody.textContent = "";
+        document.getElementById("pg-jumlah").textContent = (data || []).length;
+
+        (data || []).forEach(function (u) {
+            const tr = document.createElement("tr");
+            tr.appendChild(sel(u.username));
+            tr.appendChild(sel(u.nama));
+
+            const tdRole = document.createElement("td");
+            const sp = document.createElement("span");
+            sp.className = "lencana" + (u.role === "admin" ? " admin" : "");
+            sp.textContent = u.role;
+            tdRole.appendChild(sp);
+            tr.appendChild(tdRole);
+
+            tr.appendChild(sel(u.created_at
+                ? new Date(u.created_at).toLocaleDateString("id-ID",
+                    { day: "2-digit", month: "short", year: "numeric" })
+                : "—"));
+
+            const tdAksi = document.createElement("td");
+            if (u.id !== sesi.session.user.id) {
+                const bRole = document.createElement("button");
+                bRole.className = "aksi-ubah";
+                bRole.textContent = u.role === "admin" ? "Jadikan user" : "Jadikan admin";
+                bRole.addEventListener("click", async function () {
+                    const baru = u.role === "admin" ? "user" : "admin";
+                    if (!confirm("Ubah peran " + u.username + " menjadi " + baru + "?")) return;
+                    const { error } = await sb.from("profiles")
+                        .update({ role: baru }).eq("id", u.id);
+                    if (error) { kabar("Gagal mengubah peran: " + error.message, "galat"); return; }
+                    kabar("Peran " + u.username + " kini " + baru + ".", "sukses");
+                    await muatPengguna();
+                });
+                tdAksi.appendChild(bRole);
+            } else {
+                tdAksi.appendChild(document.createTextNode("(Anda)"));
+            }
+            tr.appendChild(tdAksi);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ---------- Muat semuanya ----------
+    await muatPrasarana();
+    await muatTarif();
+    await muatRiwayat();
+    await muatPengguna();
+})();
+</script>
+</body>
+</html>
