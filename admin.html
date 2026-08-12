@@ -355,7 +355,8 @@
                         <thead>
                             <tr>
                                 <th>Nama</th><th>Olahraga</th><th>Kecamatan</th>
-                                <th>Status</th><th>Harga</th><th></th>
+                                <th>Status</th><th>Member</th><th>Non-member</th>
+                                <th>Tarif retribusi</th><th></th>
                             </tr>
                         </thead>
                         <tbody id="pr-tbody"></tbody>
@@ -495,6 +496,25 @@
         return "Rp" + Number(n).toLocaleString("id-ID");
     }
 
+    /** Menyusun teks dua sesi, misal "Rp15.000 / Rp20.000". */
+    function gabungSesi(s1, s2) {
+        const a = rupiah(s1), b = rupiah(s2);
+        if (a && b) return a + " / " + b;
+        return a || b || null;
+    }
+
+    /** Merangkum tarif retribusi milik satu prasarana (dipakai kolam renang). */
+    function ringkasTarif(prasaranaId) {
+        const milik = daftarTarif.filter(function (t) {
+            return t.prasarana_id === prasaranaId;
+        });
+        if (milik.length === 0) return null;
+        return milik.map(function (t) {
+            const hari = t.tipe_hari ? " " + t.tipe_hari : "";
+            return t.kategori + hari + ": " + rupiah(t.tarif);
+        }).join("\n");
+    }
+
     function nilaiAtauNull(id) {
         const v = document.getElementById(id).value.trim();
         return v === "" ? null : v;
@@ -548,7 +568,7 @@
         if (hasil.length === 0) {
             const tr = document.createElement("tr");
             const td = document.createElement("td");
-            td.colSpan = 6;
+            td.colSpan = 8;
             td.className = "adm-kosong";
             td.textContent = daftarPrasarana.length === 0
                 ? "Belum ada data prasarana. Tambahkan lewat formulir di atas."
@@ -571,8 +591,14 @@
             tdStatus.appendChild(sp);
             tr.appendChild(tdStatus);
 
-            const harga = rupiah(r.harga_non_member_sesi_1) || rupiah(r.harga_member_sesi_1);
-            tr.appendChild(sel(harga));
+            // Dua sesi ditampilkan berdampingan supaya admin bisa langsung
+            // melihat mana yang sudah terisi dan mana yang masih kosong.
+            tr.appendChild(sel(gabungSesi(r.harga_member_sesi_1, r.harga_member_sesi_2)));
+            tr.appendChild(sel(gabungSesi(r.harga_non_member_sesi_1, r.harga_non_member_sesi_2)));
+
+            // Kolam renang tidak memakai kolom harga di atas, melainkan tabel
+            // tarif_retribusi terpisah. Kolom ini merangkum tarif tersebut.
+            tr.appendChild(sel(ringkasTarif(r.id), "sel-panjang"));
 
             const tdAksi = document.createElement("td");
             tdAksi.style.whiteSpace = "nowrap";
@@ -812,6 +838,7 @@
         kabar(id ? "Perubahan tersimpan." : "Tarif ditambahkan.", "sukses");
         resetFormTarif();
         await muatTarif();
+        gambarPrasarana();
     });
 
     async function hapusTarif(r) {
@@ -820,6 +847,7 @@
         if (error) { kabar("Gagal menghapus: " + error.message, "galat"); return; }
         kabar("Tarif dihapus.", "sukses");
         await muatTarif();
+        gambarPrasarana();
     }
 
     // ================= RIWAYAT CHAT =================
@@ -951,8 +979,10 @@
     }
 
     // ---------- Muat semuanya ----------
-    await muatPrasarana();
+    // Tarif dimuat lebih dulu karena kolom ringkasan tarif di tabel
+    // prasarana membaca daftarTarif.
     await muatTarif();
+    await muatPrasarana();
     await muatRiwayat();
     await muatPengguna();
 })();
