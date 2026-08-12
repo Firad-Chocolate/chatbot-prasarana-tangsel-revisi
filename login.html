@@ -132,6 +132,22 @@
             color: var(--dark-text-muted);
         }
         .auth-kaki a { color: var(--tangsel-gold); text-decoration: none; }
+        .auth-lupa {
+            margin: 14px 0 0;
+            text-align: center;
+            font-size: .82rem;
+        }
+        .auth-lupa a {
+            color: var(--tangsel-gold);
+            text-decoration: none;
+        }
+        .auth-lupa a:hover { text-decoration: underline; }
+        .auth-keterangan {
+            margin: 0 0 18px;
+            font-size: .85rem;
+            line-height: 1.5;
+            color: var(--dark-text-muted);
+        }
         .tersembunyi { display: none !important; }
     </style>
 </head>
@@ -160,6 +176,25 @@
                 <input type="password" id="masuk-sandi" autocomplete="current-password" required>
             </div>
             <button type="submit" class="auth-submit" id="tombol-masuk">Masuk</button>
+            <p class="auth-lupa">
+                <a href="#" id="tautan-lupa">Lupa kata sandi?</a>
+            </p>
+        </form>
+
+        <!-- Formulir permintaan tautan reset -->
+        <form id="form-lupa" class="tersembunyi">
+            <p class="auth-keterangan">
+                Masukkan email akun Anda. Kami akan mengirim tautan untuk
+                membuat kata sandi baru.
+            </p>
+            <div class="auth-field">
+                <label for="lupa-email">Email</label>
+                <input type="email" id="lupa-email" autocomplete="email" required>
+            </div>
+            <button type="submit" class="auth-submit" id="tombol-lupa">Kirim tautan reset</button>
+            <p class="auth-lupa">
+                <a href="#" id="tautan-kembali">Kembali ke halaman masuk</a>
+            </p>
         </form>
 
         <!-- Formulir daftar -->
@@ -244,6 +279,7 @@
         tabDaftar.classList.remove("aktif");
         formMasuk.classList.remove("tersembunyi");
         formDaftar.classList.add("tersembunyi");
+        document.getElementById("form-lupa").classList.add("tersembunyi");
         bersihkanPesan();
     });
 
@@ -252,7 +288,55 @@
         tabMasuk.classList.remove("aktif");
         formDaftar.classList.remove("tersembunyi");
         formMasuk.classList.add("tersembunyi");
+        document.getElementById("form-lupa").classList.add("tersembunyi");
         bersihkanPesan();
+    });
+
+    // --- Lupa kata sandi ---
+    const formLupa = document.getElementById("form-lupa");
+
+    document.getElementById("tautan-lupa").addEventListener("click", function (e) {
+        e.preventDefault();
+        formMasuk.classList.add("tersembunyi");
+        formDaftar.classList.add("tersembunyi");
+        formLupa.classList.remove("tersembunyi");
+        bersihkanPesan();
+    });
+
+    document.getElementById("tautan-kembali").addEventListener("click", function (e) {
+        e.preventDefault();
+        formLupa.classList.add("tersembunyi");
+        formMasuk.classList.remove("tersembunyi");
+        tabMasuk.classList.add("aktif");
+        tabDaftar.classList.remove("aktif");
+        bersihkanPesan();
+    });
+
+    formLupa.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const tombol = document.getElementById("tombol-lupa");
+        tombol.disabled = true;
+        tombol.textContent = "Mengirim…";
+        bersihkanPesan();
+
+        const email = document.getElementById("lupa-email").value.trim();
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + BASE + "reset-password.html"
+        });
+
+        tombol.disabled = false;
+        tombol.textContent = "Kirim tautan reset";
+
+        if (error) {
+            tampilkanPesan(terjemahkanGalat(error.message), "galat");
+            return;
+        }
+
+        // Pesannya sengaja tidak menyebut apakah email itu terdaftar,
+        // supaya tidak bisa dipakai menebak alamat email yang ada.
+        tampilkanPesan(
+            "Jika email tersebut terdaftar, tautan reset sudah dikirim. " +
+            "Periksa kotak masuk dan folder spam.", "sukses");
     });
 
     // --- Masuk ---
