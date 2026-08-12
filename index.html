@@ -86,13 +86,39 @@
             messagesEl.scrollTop = messagesEl.scrollHeight;
         }
 
+        // Menetralkan karakter HTML supaya teks dari server tidak pernah
+        // dieksekusi sebagai markup. Wajib dijalankan SEBELUM linkifyText,
+        // karena linkifyText menyisipkan hasilnya lewat innerHTML.
+        function escapeHtml(text) {
+            var div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Mengubah URL polos di jawaban bot menjadi tautan yang bisa diklik.
+        // actions.py mengirim google_maps_link sebagai teks biasa, jadi tanpa
+        // ini link peta tidak bisa dibuka langsung dari chat.
+        function linkifyText(text) {
+            return escapeHtml(text).replace(
+                /(https?:\/\/[^\s]+)/g,
+                '<a href="$1" target="_blank" rel="noopener noreferrer" class="msg-link">Buka Google Maps</a>'
+            );
+        }
+
         function addBubble(text, from) {
             var wrap = document.createElement("div");
             wrap.className = "msg-row " + (from === "bot" ? "msg-row-bot" : "msg-row-user");
 
             var bubble = document.createElement("div");
             bubble.className = "msg-bubble " + (from === "bot" ? "msg-bubble-bot" : "msg-bubble-user");
-            bubble.textContent = text;
+
+            // Hanya pesan bot yang di-linkify. Pesan user selalu textContent
+            // supaya ketikan user tidak pernah bisa menyuntikkan markup.
+            if (from === "bot") {
+                bubble.innerHTML = linkifyText(text);
+            } else {
+                bubble.textContent = text;
+            }
 
             wrap.appendChild(bubble);
             messagesEl.appendChild(wrap);
