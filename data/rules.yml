@@ -47,11 +47,6 @@ rules:
     - intent: daftar_tarif_kolam
     - action: action_tarif_semua_kolam
 
-- rule: Menampilkan daftar tarif semua kolam renang
-  steps:
-    - intent: daftar_tarif_kolam
-    - action: action_tarif_semua_kolam
-
 - rule: Menampilkan seluruh daftar prasarana
   steps:
     - intent: list_semua_prasarana
@@ -71,3 +66,8 @@ rules:
   steps:
     - intent: nlu_fallback
     - action: utter_default
+
+- rule: Menjawab pertanyaan di luar konteks prasarana olahraga
+  steps:
+    - intent: out_of_scope
+    - action: utter_out_of_scope
