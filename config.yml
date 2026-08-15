@@ -17,8 +17,12 @@ pipeline:
 - name: ResponseSelector
   epochs: 100
 - name: FallbackClassifier
-  threshold: 0.3
-  ambiguity_threshold: 0.1
+  # Dinaikkan dari 0.3 ke 0.6 agar pertanyaan di luar konteks prasarana
+  # olahraga tidak dipaksakan masuk ke salah satu intent yang ada.
+  # Contoh kasus: "harga tiket pesawat" sebelumnya terklasifikasi sebagai
+  # daftar_tarif_kolam hanya karena mengandung kata "harga".
+  threshold: 0.6
+  ambiguity_threshold: 0.15
 
 policies:
 - name: MemoizationPolicy
