@@ -166,7 +166,7 @@
         <div id="pesan" class="auth-pesan tersembunyi"></div>
 
         <!-- Formulir masuk -->
-        <form id="form-masuk">
+        <form id="form-masuk" novalidate>
             <div class="auth-field">
                 <label for="masuk-email">Email</label>
                 <input type="email" id="masuk-email" autocomplete="email" required>
@@ -198,7 +198,7 @@
         </form>
 
         <!-- Formulir daftar -->
-        <form id="form-daftar" class="tersembunyi">
+        <form id="form-daftar" class="tersembunyi" novalidate>
             <div class="auth-field">
                 <label for="daftar-nama">Nama lengkap</label>
                 <input type="text" id="daftar-nama" autocomplete="name" required>
@@ -342,6 +342,25 @@
     // --- Masuk ---
     formMasuk.addEventListener("submit", async function (e) {
         e.preventDefault();
+
+        // Validasi ditangani sendiri agar pesannya berbahasa Indonesia dan
+        // tetap tampil di halaman (tidak hilang seperti tooltip bawaan browser).
+        const emailIsi = document.getElementById("masuk-email").value.trim();
+        const sandiIsi = document.getElementById("masuk-sandi").value;
+
+        if (!emailIsi && !sandiIsi) {
+            tampilkanPesan("Email dan kata sandi wajib diisi.", "galat");
+            return;
+        }
+        if (!emailIsi) {
+            tampilkanPesan("Email wajib diisi.", "galat");
+            return;
+        }
+        if (!sandiIsi) {
+            tampilkanPesan("Kata sandi wajib diisi.", "galat");
+            return;
+        }
+
         const tombol = document.getElementById("tombol-masuk");
         tombol.disabled = true;
         tombol.textContent = "Memeriksa…";
@@ -369,7 +388,32 @@
         tombol.textContent = "Memproses…";
         bersihkanPesan();
 
-        const username = document.getElementById("daftar-username").value.trim();
+        const namaIsi     = document.getElementById("daftar-nama").value.trim();
+        const usernameIsi = document.getElementById("daftar-username").value.trim();
+        const emailDaftar = document.getElementById("daftar-email").value.trim();
+        const sandiDaftar = document.getElementById("daftar-sandi").value;
+
+        if (!namaIsi || !usernameIsi || !emailDaftar || !sandiDaftar) {
+            tampilkanPesan("Seluruh kolom pendaftaran wajib diisi.", "galat");
+            tombol.disabled = false;
+            tombol.textContent = "Buat akun";
+            return;
+        }
+        if (!/^[a-zA-Z0-9_-]{3,20}$/.test(usernameIsi)) {
+            tampilkanPesan("Username 3\u201320 karakter, hanya huruf, angka, " +
+                           "tanda hubung, dan garis bawah.", "galat");
+            tombol.disabled = false;
+            tombol.textContent = "Buat akun";
+            return;
+        }
+        if (sandiDaftar.length < 8) {
+            tampilkanPesan("Kata sandi minimal 8 karakter.", "galat");
+            tombol.disabled = false;
+            tombol.textContent = "Buat akun";
+            return;
+        }
+
+        const username = usernameIsi;
 
         // Peran tidak dikirim dari sini. Trigger handle_new_user() di database
         // selalu menetapkan role 'user', sehingga tidak ada yang bisa
