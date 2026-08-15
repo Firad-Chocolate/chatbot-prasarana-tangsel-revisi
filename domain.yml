@@ -15,6 +15,7 @@ intents:
   - detail_prasarana
   - tanya_tarif
   - daftar_tarif_kolam
+  - out_of_scope
 
 entities:
   - olahraga
@@ -55,6 +56,9 @@ responses:
 
   utter_default:
     - text: "Maaf, saya kurang memahami pertanyaan Anda. 🙏\n\nCoba tanyakan seperti ini:\n• *'Lapangan futsal di Pamulang?'*\n• *'Prasarana olahraga di Ciputat?'*\n• *'Info GOR Ciputat'*\n• *'Olahraga apa saja yang tersedia?'*"
+
+  utter_out_of_scope:
+    - text: "Maaf, saya hanya melayani informasi seputar prasarana olahraga milik Pemerintah Kota Tangerang Selatan. 🙏\n\nOlahraga apa yang sedang Anda cari? ⚽🎾🏊\nContoh: futsal, tenis, renang, basket, badminton"
 
   utter_ask_olahraga:
     - text: "Olahraga apa yang sedang Anda cari? ⚽🎾🏊\nContoh: futsal, tenis, renang, basket, badminton"
