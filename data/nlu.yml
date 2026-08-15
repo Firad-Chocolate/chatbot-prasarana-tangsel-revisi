@@ -288,3 +288,42 @@ nlu:
     - list harga kolam renang
     - saya mau lihat daftar harga kolam renang
     - info tarif semua kolam
+
+- intent: out_of_scope
+  examples: |
+    - harga tiket pesawat
+    - berapa harga tiket pesawat
+    - harga tiket kereta api
+    - harga bensin hari ini
+    - harga emas hari ini
+    - harga sembako
+    - harga hp terbaru
+    - harga mobil bekas
+    - harga rumah di tangsel
+    - berapa harga beras
+    - cuaca hari ini
+    - ramalan cuaca besok
+    - jam berapa sekarang
+    - siapa presiden indonesia
+    - resep nasi goreng
+    - cara membuat kue
+    - berita hari ini
+    - jadwal sholat
+    - nomor togel
+    - lowongan kerja
+    - biaya sekolah
+    - harga tiket bioskop
+    - rekomendasi film
+    - pesan makanan
+    - pesan ojek online
+    - cara daftar bpjs
+    - alamat kantor pajak
+    - nomor telepon rumah sakit
+    - jadwal kereta
+    - tarif listrik
+    - tarif pdam
+    - tarif parkir mall
+    - harga tiket konser
+    - harga saham
+    - kurs dolar hari ini
+
